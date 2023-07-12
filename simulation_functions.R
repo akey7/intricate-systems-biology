@@ -2,7 +2,7 @@ library(dplyr)
 
 initial_times_and_conditions <- function(
     length_minutes = 100, 
-    step_size_minutes = 0.1, 
+    step_size_minutes = 0.01, 
     x1_initial = 1.0, 
     x2_initial = 1.0, 
     x3_initial = 1.0, 
@@ -77,6 +77,7 @@ run_euler <- function(simulation_df, h42 = 0.75) {
   }
   
   data.frame(
+    t_minutes = simulation_df$t_minutes,
     x1 = x1, 
     x2 = x2, 
     x3 = x3, 
