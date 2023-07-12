@@ -26,7 +26,7 @@ initial <- initial_times_and_conditions()
 ### Run the timesteps
 
 ```{r}
-input2_enabled <- turn_input2_off_and_on(initial, 10, 60, cutoff_level = 0.01)
+input2_enabled <- turn_input2_off_and_on(initial, 10, 60, cutoff_level = 0.007)
 result <- run_euler(input2_enabled)
 result[nrow(result),]
 ```
