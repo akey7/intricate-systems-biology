@@ -23,14 +23,10 @@ source("simulation_functions.R")
 initial <- initial_times_and_conditions()
 ```
 
-### Prepare input2
-
-```{r}
-input2_enabled <- turn_input2_off_and_on(initial, 10, 60)
-```
-
 ### Run the timesteps
 
 ```{r}
-result <- run_euler(initial)
+input2_enabled <- turn_input2_off_and_on(initial, 10, 60, cutoff_level = 0.01)
+result <- run_euler(input2_enabled)
+result[nrow(result),]
 ```

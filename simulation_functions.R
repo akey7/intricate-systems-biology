@@ -8,7 +8,7 @@ initial_times_and_conditions <- function(
     x3_initial = 1.0, 
     x4_initial = 1.0, 
     x5_initial = 1.0,
-    input1_initial = 0.01,
+    input1_initial = 0.1,
     input2_initial = 0.99
   ) {
   t_minutes <- seq(0, length_minutes, by = step_size_minutes)
@@ -37,13 +37,13 @@ initial_times_and_conditions <- function(
   )
 }
 
-turn_input2_off_and_on <- function(simulation_df, off_at_min, on_at_min) {
+turn_input2_off_and_on <- function(simulation_df, off_at_min, on_at_min, cutoff_level = 0.0) {
   timestep <- simulation_df[2, "t_minutes"] - simulation_df[1, "t_minutes"]
   off_index <- off_at_min / timestep
   on_index <- on_at_min / timestep
   before_cutoff <- simulation_df$input2[1:off_index - 1]
   after_cutoff <- simulation_df$input2[on_index:nrow(simulation_df)]
-  downtime <- rep_len(0.0, length.out = on_index - off_index)
+  downtime <- rep_len(cutoff_level, length.out = on_index - off_index)
   new_input2 <- c(before_cutoff, downtime, after_cutoff)
   
   simulation_df %>%
@@ -74,8 +74,22 @@ run_euler <- function(simulation_df, h42 = 0.75) {
     x3[i] <- x3[i-1]+timestep*(2*x2[i-1]^0.75-2*x3[i-1]^0.4)
     x4[i] <- x4[i-1]+timestep*(2*x3[i-1]^0.4-input2*x4[i-1]^0.5-x2[i-1]^h42*x4[i-1]^0.5)
     x5[i] <- x5[i-1]+timestep*(x2[i-1]^h42*x4[i-1]^0.5-x5[i-1]^0.5)
+    
+    # x1[i] <- x1[i-1] + timestep*(input1+input2*sqrt(x4[i-1])-sqrt(x1[i-1]))
+    # x2[i] <- x2[i-1] + timestep*(sqrt(x1[i-1])-x2[i-1]^0.75)
+    # x3[i] <- x3[i-1] + timestep*(2*x2[i-1]^0.75-2*x3[i-1]^0.4)
+    # x4[i] <- x4[i-1] + timestep*(2*x3[i-1]^0.4-input2*sqrt(x4[i-1])-x2[i-1]^h42*sqrt(x4[i-1]))
+    # x5[i] <- x5[i-1] + timestep*(x2[i-1]^h42*sqrt(x4[i-1])-sqrt(x5[i-1]))
   }
   
-  data.frame(x1 = x1, x2 = x2, x3 = x3, x4 = x4, x5 = x5)
+  data.frame(
+    x1 = x1, 
+    x2 = x2, 
+    x3 = x3, 
+    x4 = x4, 
+    x5 = x5, 
+    input1 = simulation_df$input1, 
+    input2 = simulation_df$input2
+  )
 }
 
