@@ -28,3 +28,9 @@ initial <- initial_times_and_conditions()
 ```{r}
 input2_enabled <- turn_input2_off_and_on(initial, 10, 60)
 ```
+
+### Run the timesteps
+
+```{r}
+result <- run_euler(initial)
+```
