@@ -22,3 +22,9 @@ source("simulation_functions.R")
 ```{r}
 initial <- initial_times_and_conditions()
 ```
+
+### Prepare input2
+
+```{r}
+input2_enabled <- turn_input2_off_and_on(initial, 10, 60)
+```
