@@ -1,6 +1,4 @@
-library(dplyr)
-library(tidyr)
-library(ggplot2)
+# dplyr, tidyr, ggplot must be loaded before these functions.
 
 initial_conditions <- function(
     length_minutes = 100, 
