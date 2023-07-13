@@ -23,18 +23,10 @@ source("simulation_functions.R")
 
 ## Run the simulation
 
-### Generate empty simulation dataframe
-
 ```{r}
-initial <- initial_times_and_conditions()
-```
-
-### Run the timesteps
-
-```{r}
-input2_enabled <- turn_input2_off_and_on(initial, 10, 60, cutoff_level = 0.0)
-result <- run_euler(input2_enabled)
-result[nrow(result),]
+initial <- initial_times_and_conditions(length_minutes = 120)
+input2_cutoff <- turn_input2_off_and_on(initial, 10, 60, cutoff_level = 0.0)
+result <- run_euler(input2_cutoff)
 ```
 
 ## Plot the result
