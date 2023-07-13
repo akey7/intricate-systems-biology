@@ -47,13 +47,13 @@ initial_condition_df <- cross_initial_conditions(
   x5 = c(0.75, 1, 1.25)
 )
 
-run_specs <- create_run_specs(head(initial_condition_df))
+# run_specs <- create_run_specs(head(initial_condition_df))
+run_specs <- create_run_specs(initial_condition_df)
 ```
 
 ## Use doParallel to Create All Plots
 
 ```{r}
-# cl <- makeCluster(3, type='PSOCK')
 cl <- makeCluster(4, type='PSOCK')
 registerDoParallel(cl)
 
@@ -68,7 +68,6 @@ results <- foreach(i=1:length(run_specs), .packages = "tidyverse") %dopar% {
   )
 }
 
-# turn parallel processing off and run sequentially again:
 registerDoSEQ()
 ```
 
