@@ -42,7 +42,7 @@ initial_condition_df <- crossing(
 ## Turn Each Row Into a Vector
 
 ```{r}
-initial_condition_list <- vector(mode = "list", length = nrow(initial_condition_df))
+ics <- vector(mode = "list", length = nrow(initial_condition_df))
 
 for (i in 1:nrow(initial_condition_df)) {
   initial_condition_vec <- vector(mode = "numeric", length = length(initial_condition_df))
@@ -53,7 +53,7 @@ for (i in 1:nrow(initial_condition_df)) {
   initial_condition_vec[4] <- initial_condition_df[i, "x4"]
   initial_condition_vec[5] <- initial_condition_df[i, "x5"]
   
-  initial_condition_list[[i]] <- initial_condition_vec
+  ics[[i]] <- initial_condition_vec
 }
 ```
 
@@ -63,17 +63,7 @@ for (i in 1:nrow(initial_condition_df)) {
 cl <- makeCluster(3, type='PSOCK')
 registerDoParallel(cl)
 
-# initial_condition_plots <- lapply(initial_condition_list, function(ics) {
-#   initial_conditions_run_and_plot(
-#     x1_initial = ics[[1]],
-#     x2_initial = ics[[2]],
-#     x3_initial = ics[[3]],
-#     x4_initial = ics[[4]],
-#     x5_initial = ics[[5]]
-#   )
-# })
-
-initial_condition_plots <- foreach(i=1:length(initial_condition_list)) %dopar% {
+initial_condition_plots <- foreach(i=1:length(ics), .packages = "tidyverse") %dopar% {
   initial_conditions_run_and_plot(
     x1_initial = ics[[i]][[1]],
     x2_initial = ics[[i]][[2]],
@@ -90,5 +80,5 @@ registerDoSEQ()
 ## Try One of the Plots?
 
 ```{r}
-# initial_condition_plots[[100]]
+initial_condition_plots[[100]]
 ```
