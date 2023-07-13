@@ -47,7 +47,7 @@ initial_condition_df <- cross_initial_conditions(
   x5 = c(0.75, 1, 1.25)
 )
 
-run_specs <- create_run_specs(initial_condition_df)
+run_specs <- create_run_specs(head(initial_condition_df))
 ```
 
 ## Use doParallel to Create All Plots
@@ -57,7 +57,7 @@ run_specs <- create_run_specs(initial_condition_df)
 cl <- makeCluster(4, type='PSOCK')
 registerDoParallel(cl)
 
-initial_condition_plots <- foreach(i=1:length(run_specs), .packages = "tidyverse") %dopar% {
+results <- foreach(i=1:length(run_specs), .packages = "tidyverse") %dopar% {
   initial_conditions_run_and_plot(
     run_name = run_specs[[i]][["run_name"]],
     x1_initial = run_specs[[i]][["ics"]][[1]],
@@ -75,23 +75,16 @@ registerDoSEQ()
 ## Display a run name and sample plot
 
 ```{r}
-initial_condition_plots[[100]][["run_name"]]
+results[[1]][["run_name"]]
 ```
 
 ```{r}
-initial_condition_plots[[100]][["simulation_plot"]]
+results[[1]][["simulation_plot"]]
 ```
 
 ## Write the plots and csvs to the filesystem.
 
 ```{r}
-walk(initial_condition_plots, function(.x) {
-  csv_filename <- here("output", "csvs", paste(.x[["run_name"]], "csv", sep = "."))
-  plot_filename <- here("output", "plots", paste(.x[["run_name"]], "png", sep = "."))
-  write_csv(.x[["friendly_df"]], csv_filename, col_names = TRUE, na = "")
-  print(paste("Wrote", csv_filename, sep = " "))
-  ggsave(plot_filename, plot = .x[["simulation_plot"]], units = "in", dpi = 300, height = 3, width = 5)
-  print(paste("Wrote", plot_filename, sep = " "))
-})
+write_csvs_and_plots(results)
 ```
 
