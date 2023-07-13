@@ -88,13 +88,108 @@ run_euler <- function(simulation_df, h42 = 0.75) {
   )
 }
 
-initial_conditions_run_and_plot <- function(...) {
-  initial_conditions(...) %>%
-    turn_input2_off_and_on() %>%
-    run_euler() %>%
-    select(-input1, -input2) %>%
-    pivot_longer(-t_minutes, values_to = "concentration", names_to = "metabolite") %>%
-    ggplot(aes(x = t_minutes, y = concentration, color = metabolite)) +
-    geom_line(linewidth = 1)
+cross_initial_conditions <- function(x1, x2, x3, x4, x5) {
+  x1_initial_df <- data.frame(x1 = x1)
+  x2_initial_df <- data.frame(x2 = x2)
+  x3_initial_df <- data.frame(x3 = x3)
+  x4_initial_df <- data.frame(x4 = x4)
+  x5_initial_df <- data.frame(x5 = x5)
+  
+  initial_condition_df <- crossing(
+    x1_initial_df, 
+    x2_initial_df, 
+    x3_initial_df,
+    x4_initial_df,
+    x5_initial_df
+  )
 }
 
+create_run_specs <- function(initial_condition_df) {
+  run_specs <- vector(mode = "list", length = nrow(initial_condition_df))
+  
+  serial <- 1
+  
+  for (i in 1:nrow(initial_condition_df)) {
+    initial_condition_vec <- vector(mode = "numeric", length = length(initial_condition_df))
+    
+    initial_condition_vec[1] <- initial_condition_df[i, "x1"]
+    initial_condition_vec[2] <- initial_condition_df[i, "x2"]
+    initial_condition_vec[3] <- initial_condition_df[i, "x3"]
+    initial_condition_vec[4] <- initial_condition_df[i, "x4"]
+    initial_condition_vec[5] <- initial_condition_df[i, "x5"]
+    
+    run_specs[[i]] <- vector(mode = "list", length = 2)
+    run_specs[[i]][["ics"]] <- initial_condition_vec
+    run_specs[[i]][["run_name"]] <- paste("run", serial, sep = "_")
+    
+    serial <- serial + 1
+  }
+  
+  run_specs
+}
+
+initial_conditions_run_and_plot <- function(run_name, x1_initial, x2_initial, x3_initial, x4_initial, x5_initial) {
+  simulation_df <- initial_conditions(
+      x1_initial = x1_initial, 
+      x2_initial = x2_initial, 
+      x3_initial = x3_initial, 
+      x4_initial = x4_initial, 
+      x5_initial = x5_initial
+    ) %>%
+    turn_input2_off_and_on() %>%
+    run_euler()
+  
+  simulation_plot_title <- paste(
+    "ICs:",
+    paste(
+      x1_initial,
+      x2_initial,
+      x3_initial,
+      x4_initial,
+      x5_initial,
+      sep = ", "
+    ),
+    sep = " "
+  )
+  
+  simulation_plot_df <- simulation_df %>%
+    select(-input1, -input2) %>%
+    pivot_longer(-t_minutes, values_to = "concentration", names_to = "xi") %>%
+    transmute(
+      t_minutes,
+      concentration,
+      "metabolite" = case_when(
+        xi == "x1" ~ "G6P",
+        xi == "x2" ~ "FBP",
+        xi == "x3" ~ "3_PGA",
+        xi == "x4" ~ "PEP",
+        xi == "x5" ~ "pyruvate",
+        TRUE ~ "unknown"  # This condition should never be reached
+      )
+    )
+  
+  friendly_df <- simulation_plot_df %>%
+    pivot_wider(names_from = "metabolite", values_from = "concentration")
+  
+  simulation_plot <- simulation_plot_df %>%
+    ggplot(aes(x = t_minutes, y = concentration, color = metabolite)) +
+    geom_line(linewidth = 1) +
+    labs(
+      x = "t (minutes)",
+      y = "concentration (au)",
+      title = simulation_plot_title
+    )
+  
+  list(friendly_df = friendly_df, simulation_plot = simulation_plot, run_name = run_name)
+}
+
+write_csvs_and_plots <- function(results_list) {
+  walk(results_list, function(.x) {
+    csv_filename <- here("output", "csvs", paste(.x[["run_name"]], "csv", sep = "."))
+    plot_filename <- here("output", "plots", paste(.x[["run_name"]], "png", sep = "."))
+    write_csv(.x[["friendly_df"]], csv_filename, col_names = TRUE, na = "")
+    print(paste("Wrote", csv_filename, sep = " "))
+    ggsave(plot_filename, plot = .x[["simulation_plot"]], units = "in", dpi = 300, height = 3, width = 5)
+    print(paste("Wrote", plot_filename, sep = " "))
+  })
+}
