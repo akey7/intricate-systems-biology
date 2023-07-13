@@ -21,81 +21,36 @@ library(tidyverse)
 source("simulation_functions.R")
 ```
 
-## Test simulation
-
-Start with initial conditions x1=x2=x3=x4=x5=1
-
-### Run the simulation
+## Basic test of defaults
 
 ```{r}
-initial <- initial_times_and_conditions(length_minutes = 120)
-input2_cutoff <- turn_input2_off_and_on(initial, 10, 60, cutoff_level = 0.0)
-result <- run_euler(input2_cutoff)
-```
-
-### Plot the result
-
-```{r}
-result %>%
+initial_times_and_conditions() %>%
+  turn_input2_off_and_on(off_at_min = 10, on_at_min = 60) %>%
+  run_euler() %>%
   select(-input1, -input2) %>%
-  pivot_longer(-t_minutes, values_to = "concentration", names_to = "metabolite") %>%
-  ggplot(aes(x = t_minutes, y = concentration, color = metabolite)) +
+  pivot_longer(-t_minutes) %>%
+  ggplot(aes(x = t_minutes, y = value, color = name)) +
   geom_line(linewidth = 1)
 ```
 
-## Now test other initial conditions
-
-### First, unperturbed.
-
-Not even a cutoff of input2!
+## Basic test of defaults
 
 ```{r}
-initial10 <- initial_times_and_conditions(length_minutes = 120)
-result10 <- run_euler(initial10)
-```
-
-Plot it
-
-```{r}
-result10 %>%
+initial_times_and_conditions(x4_initial = 2) %>%
+  turn_input2_off_and_on(off_at_min = 10, on_at_min = 20) %>%
+  run_euler() %>%
   select(-input1, -input2) %>%
-  pivot_longer(-t_minutes, values_to = "concentration", names_to = "metabolite") %>%
-  ggplot(aes(x = t_minutes, y = concentration, color = metabolite)) +
+  pivot_longer(-t_minutes) %>%
+  ggplot(aes(x = t_minutes, y = value, color = name)) +
   geom_line(linewidth = 1)
 ```
 
-### Small perturbations
-
-x1 = 0.9
-
 ```{r}
-initial09 <- initial_times_and_conditions(x1_initial = 0.9, length_minutes = 120)
-result09 <- run_euler(initial09)
-```
-
-Plot it
-
-```{r}
-result09 %>%
+initial_times_and_conditions(x4_initial = 6) %>%
+  turn_input2_off_and_on(off_at_min = 10, on_at_min = 20) %>%
+  run_euler() %>%
   select(-input1, -input2) %>%
-  pivot_longer(-t_minutes, values_to = "concentration", names_to = "metabolite") %>%
-  ggplot(aes(x = t_minutes, y = concentration, color = metabolite)) +
-  geom_line(linewidth = 1)
-```
-
-x1 = 1.1
-
-```{r}
-initial11 <- initial_times_and_conditions(x1_initial = 1.1, length_minutes = 120)
-result11 <- run_euler(initial11)
-```
-
-Plot it
-
-```{r}
-result11 %>%
-  select(-input1, -input2) %>%
-  pivot_longer(-t_minutes, values_to = "concentration", names_to = "metabolite") %>%
-  ggplot(aes(x = t_minutes, y = concentration, color = metabolite)) +
+  pivot_longer(-t_minutes) %>%
+  ggplot(aes(x = t_minutes, y = value, color = name)) +
   geom_line(linewidth = 1)
 ```
