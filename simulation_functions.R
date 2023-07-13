@@ -88,6 +88,22 @@ run_euler <- function(simulation_df, h42 = 0.75) {
   )
 }
 
+cross_initial_conditions <- function(x1, x2, x3, x4, x5) {
+  x1_initial_df <- data.frame(x1 = x1)
+  x2_initial_df <- data.frame(x2 = x2)
+  x3_initial_df <- data.frame(x3 = x3)
+  x4_initial_df <- data.frame(x4 = x4)
+  x5_initial_df <- data.frame(x5 = x5)
+  
+  initial_condition_df <- crossing(
+    x1_initial_df, 
+    x2_initial_df, 
+    x3_initial_df,
+    x4_initial_df,
+    x5_initial_df
+  )
+}
+
 initial_conditions_run_and_plot <- function(run_name, x1_initial, x2_initial, x3_initial, x4_initial, x5_initial) {
   simulation_df <- initial_conditions(
       x1_initial = x1_initial, 
