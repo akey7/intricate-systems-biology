@@ -24,7 +24,7 @@ source("simulation_functions.R")
 ## Basic test of defaults
 
 ```{r}
-initial_times_and_conditions() %>%
+initial_conditions() %>%
   turn_input2_off_and_on(off_at_min = 10, on_at_min = 60) %>%
   run_euler() %>%
   select(-input1, -input2) %>%
@@ -36,7 +36,7 @@ initial_times_and_conditions() %>%
 ## Basic test of defaults
 
 ```{r}
-initial_times_and_conditions(x4_initial = 2) %>%
+initial_conditions(x4_initial = 2) %>%
   turn_input2_off_and_on(off_at_min = 10, on_at_min = 20) %>%
   run_euler() %>%
   select(-input1, -input2) %>%
@@ -46,7 +46,7 @@ initial_times_and_conditions(x4_initial = 2) %>%
 ```
 
 ```{r}
-initial_times_and_conditions(x4_initial = 6) %>%
+initial_conditions(x4_initial = 6) %>%
   turn_input2_off_and_on(off_at_min = 10, on_at_min = 20) %>%
   run_euler() %>%
   select(-input1, -input2) %>%
