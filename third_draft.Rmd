@@ -17,6 +17,7 @@ library(dplyr)
 library(tidyr)
 library(ggplot2)
 library(purrr)
+library(doParallel)
 source("simulation_functions.R")
 ```
 
@@ -59,19 +60,35 @@ for (i in 1:nrow(initial_condition_df)) {
 ## Use mclapply to Create All Plots
 
 ```{r}
-initial_condition_plots <- lapply(initial_condition_list, function(ics) {
+cl <- makeCluster(3, type='PSOCK')
+registerDoParallel(cl)
+
+# initial_condition_plots <- lapply(initial_condition_list, function(ics) {
+#   initial_conditions_run_and_plot(
+#     x1_initial = ics[[1]],
+#     x2_initial = ics[[2]],
+#     x3_initial = ics[[3]],
+#     x4_initial = ics[[4]],
+#     x5_initial = ics[[5]]
+#   )
+# })
+
+initial_condition_plots <- foreach(i=1:length(initial_condition_list)) %dopar% {
   initial_conditions_run_and_plot(
-    x1_initial = ics[[1]],
-    x2_initial = ics[[2]],
-    x3_initial = ics[[3]],
-    x4_initial = ics[[4]],
-    x5_initial = ics[[5]]
+    x1_initial = ics[[i]][[1]],
+    x2_initial = ics[[i]][[2]],
+    x3_initial = ics[[i]][[3]],
+    x4_initial = ics[[i]][[4]],
+    x5_initial = ics[[i]][[5]]
   )
-})
+}
+
+# turn parallel processing off and run sequentially again:
+registerDoSEQ()
 ```
 
 ## Try One of the Plots?
 
 ```{r}
-initial_condition_plots[[100]]
+# initial_condition_plots[[100]]
 ```
