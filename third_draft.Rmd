@@ -29,7 +29,7 @@ x3_initial_values <- data.frame(x3 = c(0.75, 1, 1.25))
 x4_initial_values <- data.frame(x4 = c(0.75, 1, 1.25))
 x5_initial_values <- data.frame(x5 = c(0.75, 1, 1.25))
 
-initial_condition_values <- crossing(
+initial_condition_df <- crossing(
   x1_initial_values, 
   x2_initial_values, 
   x3_initial_values,
@@ -37,3 +37,22 @@ initial_condition_values <- crossing(
   x5_initial_values
 )
 ```
+
+## Turn Each Row Into a Vector
+
+```{r}
+initial_condition_list <- vector(mode = "list", length = nrow(initial_condition_df))
+
+for (i in 1:nrow(initial_condition_df)) {
+  initial_condition_vec <- vector(mode = "numeric", length = length(initial_condition_df))
+  
+  initial_condition_vec[1] <- initial_condition_df[i, "x1"]
+  initial_condition_vec[2] <- initial_condition_df[i, "x2"]
+  initial_condition_vec[3] <- initial_condition_df[i, "x3"]
+  initial_condition_vec[4] <- initial_condition_df[i, "x4"]
+  initial_condition_vec[5] <- initial_condition_df[i, "x5"]
+  
+  initial_condition_list[[i]] <- initial_condition_vec
+}
+```
+
