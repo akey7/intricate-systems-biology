@@ -104,6 +104,30 @@ cross_initial_conditions <- function(x1, x2, x3, x4, x5) {
   )
 }
 
+create_run_specs <- function(initial_condition_df) {
+  run_specs <- vector(mode = "list", length = nrow(initial_condition_df))
+  
+  serial <- 1
+  
+  for (i in 1:nrow(initial_condition_df)) {
+    initial_condition_vec <- vector(mode = "numeric", length = length(initial_condition_df))
+    
+    initial_condition_vec[1] <- initial_condition_df[i, "x1"]
+    initial_condition_vec[2] <- initial_condition_df[i, "x2"]
+    initial_condition_vec[3] <- initial_condition_df[i, "x3"]
+    initial_condition_vec[4] <- initial_condition_df[i, "x4"]
+    initial_condition_vec[5] <- initial_condition_df[i, "x5"]
+    
+    run_specs[[i]] <- vector(mode = "list", length = 2)
+    run_specs[[i]][["ics"]] <- initial_condition_vec
+    run_specs[[i]][["run_name"]] <- paste("run", serial, sep = "_")
+    
+    serial <- serial + 1
+  }
+  
+  run_specs
+}
+
 initial_conditions_run_and_plot <- function(run_name, x1_initial, x2_initial, x3_initial, x4_initial, x5_initial) {
   simulation_df <- initial_conditions(
       x1_initial = x1_initial, 
