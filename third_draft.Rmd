@@ -76,7 +76,7 @@ for (i in 1:nrow(initial_condition_df)) {
 }
 ```
 
-## Use mclapply to Create All Plots
+## Use doParallel to Create All Plots
 
 ```{r}
 # cl <- makeCluster(3, type='PSOCK')
