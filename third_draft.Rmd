@@ -17,7 +17,9 @@ library(dplyr)
 library(tidyr)
 library(ggplot2)
 library(purrr)
+library(readr)
 library(doParallel)
+library(here)
 source("simulation_functions.R")
 ```
 
@@ -70,8 +72,26 @@ initial_condition_plots <- foreach(i=1:length(run_specs), .packages = "tidyverse
 registerDoSEQ()
 ```
 
-## Display a Sample Plot
+## Display a run name and sample plot
+
+```{r}
+initial_condition_plots[[100]][["run_name"]]
+```
 
 ```{r}
 initial_condition_plots[[100]][["simulation_plot"]]
 ```
+
+## Write the plots and csvs to the filesystem.
+
+```{r}
+walk(initial_condition_plots, function(.x) {
+  csv_filename <- here("output", "csvs", paste(.x[["run_name"]], "csv", sep = "."))
+  plot_filename <- here("output", "plots", paste(.x[["run_name"]], "png", sep = "."))
+  write_csv(.x[["friendly_df"]], csv_filename, col_names = TRUE, na = "")
+  print(paste("Wrote", csv_filename, sep = " "))
+  ggsave(plot_filename, plot = .x[["simulation_plot"]], units = "in", dpi = 300, height = 3, width = 5)
+  print(paste("Wrote", plot_filename, sep = " "))
+})
+```
+
