@@ -37,18 +37,26 @@ theme_set(
 ## Setup Initial Conditions
 
 ```{r}
-x1_initial_values <- data.frame(x1 = c(0.75, 1, 1.25))
-x2_initial_values <- data.frame(x2 = c(0.75, 1, 1.25))
-x3_initial_values <- data.frame(x3 = c(0.75, 1, 1.25))
-x4_initial_values <- data.frame(x4 = c(0.75, 1, 1.25))
-x5_initial_values <- data.frame(x5 = c(0.75, 1, 1.25))
+# x1_initial_values <- data.frame(x1 = c(0.75, 1, 1.25))
+# x2_initial_values <- data.frame(x2 = c(0.75, 1, 1.25))
+# x3_initial_values <- data.frame(x3 = c(0.75, 1, 1.25))
+# x4_initial_values <- data.frame(x4 = c(0.75, 1, 1.25))
+# x5_initial_values <- data.frame(x5 = c(0.75, 1, 1.25))
+# 
+# initial_condition_df <- crossing(
+#   x1_initial_values, 
+#   x2_initial_values, 
+#   x3_initial_values,
+#   x4_initial_values,
+#   x5_initial_values
+# )
 
-initial_condition_df <- crossing(
-  x1_initial_values, 
-  x2_initial_values, 
-  x3_initial_values,
-  x4_initial_values,
-  x5_initial_values
+initial_condition_df <- cross_initial_conditions(
+  x1 = c(0.75, 1, 1.25),
+  x2 = c(0.75, 1, 1.25),
+  x3 = c(0.75, 1, 1.25),
+  x4 = c(0.75, 1, 1.25),
+  x5 = c(0.75, 1, 1.25)
 )
 ```
 
