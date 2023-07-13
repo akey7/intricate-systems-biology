@@ -42,6 +42,8 @@ result[nrow(result),]
 ```{r}
 result %>%
   select(-input1, -input2) %>%
-  pivot_longer(-t_minutes)
+  pivot_longer(-t_minutes, values_to = "concentration", names_to = "metabolite") %>%
+  ggplot(aes(x = t_minutes, y = concentration, color = metabolite)) +
+  geom_line(linewidth = 1)
 ```
 
