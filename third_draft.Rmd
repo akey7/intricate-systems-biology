@@ -70,7 +70,7 @@ initial_condition_plots <- foreach(i=1:length(run_specs), .packages = "tidyverse
 registerDoSEQ()
 ```
 
-## Try One of the Plots?
+## Display a Sample Plot
 
 ```{r}
 initial_condition_plots[[100]][["simulation_plot"]]
