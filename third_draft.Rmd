@@ -56,7 +56,7 @@ for (i in 1:nrow(initial_condition_df)) {
 }
 ```
 
-## Use lapply to Create All Plots
+## Use mclapply to Create All Plots
 
 ```{r}
 initial_condition_plots <- lapply(initial_condition_list, function(ics) {
@@ -67,7 +67,6 @@ initial_condition_plots <- lapply(initial_condition_list, function(ics) {
     x4_initial = ics[[4]],
     x5_initial = ics[[5]]
   )
-  # print(ics)
 })
 ```
 
