@@ -88,8 +88,14 @@ run_euler <- function(simulation_df, h42 = 0.75) {
   )
 }
 
-initial_conditions_run_and_plot <- function(...) {
-  simulation_df <- initial_conditions(...) %>%
+initial_conditions_run_and_plot <- function(x1_initial, x2_initial, x3_initial, x4_initial, x5_initial) {
+  simulation_df <- initial_conditions(
+      x1_initial = x1_initial, 
+      x2_initial = x2_initial, 
+      x3_initial = x3_initial, 
+      x4_initial = x4_initial, 
+      x5_initial = x5_initial
+    ) %>%
     turn_input2_off_and_on() %>%
     run_euler()
   
