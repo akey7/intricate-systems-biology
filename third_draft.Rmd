@@ -34,7 +34,7 @@ theme_set(
 )
 ```
 
-## Setup Initial Conditions
+## Setup Initial Conditions and Run Specs
 
 ```{r}
 initial_condition_df <- cross_initial_conditions(
@@ -44,30 +44,8 @@ initial_condition_df <- cross_initial_conditions(
   x4 = c(0.75, 1, 1.25),
   x5 = c(0.75, 1, 1.25)
 )
-```
 
-## Turn Each Row Into a Vector
-
-```{r}
-run_specs <- vector(mode = "list", length = nrow(initial_condition_df))
-
-serial <- 1
-
-for (i in 1:nrow(initial_condition_df)) {
-  initial_condition_vec <- vector(mode = "numeric", length = length(initial_condition_df))
-  
-  initial_condition_vec[1] <- initial_condition_df[i, "x1"]
-  initial_condition_vec[2] <- initial_condition_df[i, "x2"]
-  initial_condition_vec[3] <- initial_condition_df[i, "x3"]
-  initial_condition_vec[4] <- initial_condition_df[i, "x4"]
-  initial_condition_vec[5] <- initial_condition_df[i, "x5"]
-  
-  run_specs[[i]] <- vector(mode = "list", length = 2)
-  run_specs[[i]][["ics"]] <- initial_condition_vec
-  run_specs[[i]][["run_name"]] <- paste("run", serial, sep = "_")
-  
-  serial <- serial + 1
-}
+run_specs <- create_run_specs(initial_condition_df)
 ```
 
 ## Use doParallel to Create All Plots
