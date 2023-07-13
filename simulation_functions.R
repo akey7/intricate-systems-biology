@@ -1,6 +1,8 @@
 library(dplyr)
+library(tidyr)
+library(ggplot2)
 
-initial_times_and_conditions <- function(
+initial_conditions <- function(
     length_minutes = 100, 
     step_size_minutes = 0.01, 
     x1_initial = 1.0, 
@@ -37,7 +39,7 @@ initial_times_and_conditions <- function(
   )
 }
 
-turn_input2_off_and_on <- function(simulation_df, off_at_min, on_at_min, cutoff_level = 0.0) {
+turn_input2_off_and_on <- function(simulation_df, off_at_min = 10, on_at_min = 60, cutoff_level = 0.0) {
   timestep <- simulation_df[2, "t_minutes"] - simulation_df[1, "t_minutes"]
   off_index <- off_at_min / timestep
   on_index <- on_at_min / timestep
@@ -86,5 +88,15 @@ run_euler <- function(simulation_df, h42 = 0.75) {
     input1 = simulation_df$input1, 
     input2 = simulation_df$input2
   )
+}
+
+initial_conditions_run_and_plot <- function(...) {
+  initial_conditions(...) %>%
+    turn_input2_off_and_on() %>%
+    run_euler() %>%
+    select(-input1, -input2) %>%
+    pivot_longer(-t_minutes, values_to = "concentration", names_to = "metabolite") %>%
+    ggplot(aes(x = t_minutes, y = concentration, color = metabolite)) +
+    geom_line(linewidth = 1)
 }
 
