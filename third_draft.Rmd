@@ -81,5 +81,5 @@ registerDoSEQ()
 ## Try One of the Plots?
 
 ```{r}
-initial_condition_plots[[100]]
+initial_condition_plots[[100]][["simulation_plot"]]
 ```
