@@ -1,0 +1,21 @@
+---
+title: "Second Draft"
+output: html_document
+date: "`r Sys.Date()`"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Libraries and Functions
+
+```{r}
+source("simulation_functions.R")
+```
+
+## Run a simple simulation
+
+```{r}
+initial_conditions_run_and_plot()
+```
