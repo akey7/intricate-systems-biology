@@ -89,12 +89,16 @@ run_euler <- function(simulation_df, h42 = 0.75) {
 }
 
 initial_conditions_run_and_plot <- function(...) {
-  initial_conditions(...) %>%
+  simulation_df <- initial_conditions(...) %>%
     turn_input2_off_and_on() %>%
-    run_euler() %>%
+    run_euler()
+  
+  simulation_plot <- simulation_df %>%
     select(-input1, -input2) %>%
     pivot_longer(-t_minutes, values_to = "concentration", names_to = "metabolite") %>%
     ggplot(aes(x = t_minutes, y = concentration, color = metabolite)) +
     geom_line(linewidth = 1)
+  
+  list(simulation_df = simulation_df, simulation_plot = simulation_plot)
 }
 
