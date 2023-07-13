@@ -99,11 +99,29 @@ initial_conditions_run_and_plot <- function(x1_initial, x2_initial, x3_initial, 
     turn_input2_off_and_on() %>%
     run_euler()
   
+  simulation_plot_title <- paste(
+    "ICs:",
+    paste(
+      x1_initial,
+      x2_initial,
+      x3_initial,
+      x4_initial,
+      x5_initial,
+      sep = ", "
+    ),
+    sep = " "
+  )
+  
   simulation_plot <- simulation_df %>%
     select(-input1, -input2) %>%
     pivot_longer(-t_minutes, values_to = "concentration", names_to = "metabolite") %>%
     ggplot(aes(x = t_minutes, y = concentration, color = metabolite)) +
-    geom_line(linewidth = 1)
+    geom_line(linewidth = 1) +
+    labs(
+      x = "t (minutes)",
+      y = "concentration (au)",
+      title = simulation_plot_title
+    )
   
   list(simulation_df = simulation_df, simulation_plot = simulation_plot)
 }
