@@ -21,6 +21,19 @@ library(doParallel)
 source("simulation_functions.R")
 ```
 
+## Make a theme for the plots
+
+```{r}
+theme_set(
+  theme_linedraw() +
+    theme(
+      plot.title = element_text(size = 18, face = "bold"),
+      axis.title = element_text(size = 12, face = "bold"),
+      axis.text = element_text(size = 9)
+    )
+)
+```
+
 ## Setup Initial Conditions
 
 ```{r}
