@@ -88,7 +88,7 @@ run_euler <- function(simulation_df, h42 = 0.75) {
   )
 }
 
-initial_conditions_run_and_plot <- function(x1_initial, x2_initial, x3_initial, x4_initial, x5_initial) {
+initial_conditions_run_and_plot <- function(run_name, x1_initial, x2_initial, x3_initial, x4_initial, x5_initial) {
   simulation_df <- initial_conditions(
       x1_initial = x1_initial, 
       x2_initial = x2_initial, 
@@ -123,6 +123,6 @@ initial_conditions_run_and_plot <- function(x1_initial, x2_initial, x3_initial, 
       title = simulation_plot_title
     )
   
-  list(simulation_df = simulation_df, simulation_plot = simulation_plot)
+  list(simulation_df = simulation_df, simulation_plot = simulation_plot, run_name = run_name)
 }
 
