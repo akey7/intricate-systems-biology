@@ -55,7 +55,9 @@ initial_condition_df <- crossing(
 ## Turn Each Row Into a Vector
 
 ```{r}
-ics <- vector(mode = "list", length = nrow(initial_condition_df))
+run_specs <- vector(mode = "list", length = nrow(initial_condition_df))
+
+serial <- 1
 
 for (i in 1:nrow(initial_condition_df)) {
   initial_condition_vec <- vector(mode = "numeric", length = length(initial_condition_df))
@@ -66,7 +68,11 @@ for (i in 1:nrow(initial_condition_df)) {
   initial_condition_vec[4] <- initial_condition_df[i, "x4"]
   initial_condition_vec[5] <- initial_condition_df[i, "x5"]
   
-  ics[[i]] <- initial_condition_vec
+  run_specs[[i]] <- vector(mode = "list", length = 2)
+  run_specs[[i]][["ics"]] <- initial_condition_vec
+  run_specs[[i]][["run_name"]] <- paste("run", serial, sep = "_")
+  
+  serial <- serial + 1
 }
 ```
 
@@ -77,13 +83,14 @@ for (i in 1:nrow(initial_condition_df)) {
 cl <- makeCluster(4, type='PSOCK')
 registerDoParallel(cl)
 
-initial_condition_plots <- foreach(i=1:length(ics), .packages = "tidyverse") %dopar% {
+initial_condition_plots <- foreach(i=1:length(run_specs), .packages = "tidyverse") %dopar% {
   initial_conditions_run_and_plot(
-    x1_initial = ics[[i]][[1]],
-    x2_initial = ics[[i]][[2]],
-    x3_initial = ics[[i]][[3]],
-    x4_initial = ics[[i]][[4]],
-    x5_initial = ics[[i]][[5]]
+    run_name = run_specs[[i]][["run_name"]],
+    x1_initial = run_specs[[i]][["ics"]][[1]],
+    x2_initial = run_specs[[i]][["ics"]][[2]],
+    x3_initial = run_specs[[i]][["ics"]][[3]],
+    x4_initial = run_specs[[i]][["ics"]][[4]],
+    x5_initial = run_specs[[i]][["ics"]][[5]]
   )
 }
 
