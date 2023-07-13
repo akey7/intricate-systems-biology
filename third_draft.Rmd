@@ -56,3 +56,23 @@ for (i in 1:nrow(initial_condition_df)) {
 }
 ```
 
+## Use lapply to Create All Plots
+
+```{r}
+initial_condition_plots <- lapply(initial_condition_list, function(ics) {
+  initial_conditions_run_and_plot(
+    x1_initial = ics[[1]],
+    x2_initial = ics[[2]],
+    x3_initial = ics[[3]],
+    x4_initial = ics[[4]],
+    x5_initial = ics[[5]]
+  )
+  # print(ics)
+})
+```
+
+## Try One of the Plots?
+
+```{r}
+initial_condition_plots[[100]]
+```
