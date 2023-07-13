@@ -152,19 +152,26 @@ initial_conditions_run_and_plot <- function(run_name, x1_initial, x2_initial, x3
     sep = " "
   )
   
-  simulation_plot <- simulation_df %>%
+  simulation_plot_df <- simulation_df %>%
     select(-input1, -input2) %>%
     pivot_longer(-t_minutes, values_to = "concentration", names_to = "xi") %>%
-    mutate(
+    transmute(
+      t_minutes,
+      concentration,
       "metabolite" = case_when(
         xi == "x1" ~ "G6P",
         xi == "x2" ~ "FBP",
-        xi == "x3" ~ "3-PGA",
+        xi == "x3" ~ "3_PGA",
         xi == "x4" ~ "PEP",
         xi == "x5" ~ "pyruvate",
         TRUE ~ "unknown"  # This condition should never be reached
       )
-    ) %>%
+    )
+  
+  friendly_df <- simulation_plot_df %>%
+    pivot_wider(names_from = "metabolite", values_from = "concentration")
+  
+  simulation_plot <- simulation_plot_df %>%
     ggplot(aes(x = t_minutes, y = concentration, color = metabolite)) +
     geom_line(linewidth = 1) +
     labs(
@@ -173,6 +180,6 @@ initial_conditions_run_and_plot <- function(run_name, x1_initial, x2_initial, x3
       title = simulation_plot_title
     )
   
-  list(simulation_df = simulation_df, simulation_plot = simulation_plot, run_name = run_name)
+  list(friendly_df = friendly_df, simulation_plot = simulation_plot, run_name = run_name)
 }
 
