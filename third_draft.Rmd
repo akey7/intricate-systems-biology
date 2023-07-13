@@ -60,7 +60,8 @@ for (i in 1:nrow(initial_condition_df)) {
 ## Use mclapply to Create All Plots
 
 ```{r}
-cl <- makeCluster(3, type='PSOCK')
+# cl <- makeCluster(3, type='PSOCK')
+cl <- makeCluster(4, type='PSOCK')
 registerDoParallel(cl)
 
 initial_condition_plots <- foreach(i=1:length(ics), .packages = "tidyverse") %dopar% {
