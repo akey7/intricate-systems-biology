@@ -112,7 +112,8 @@ create_run_specs <- function(initial_condition_df) {
   serial <- 1
   
   for (i in 1:nrow(initial_condition_df)) {
-    initial_condition_vec <- vector(mode = "numeric", length = length(initial_condition_df))
+    # initial_condition_vec <- vector(mode = "numeric", length = length(initial_condition_df))
+    initial_condition_vec <- numeric(5)
     
     initial_condition_vec[1] <- initial_condition_df[i, "x1"]
     initial_condition_vec[2] <- initial_condition_df[i, "x2"]
