@@ -152,7 +152,7 @@ initial_conditions_run_and_plot <- function(run_name, x1_initial, x2_initial, x3
     sep = " "
   )
   
-  simulation_plot_df <- simulation_df %>%
+  simulation_df_long <- simulation_df %>%
     select(-input1, -input2) %>%
     pivot_longer(-t_minutes, values_to = "concentration", names_to = "xi") %>%
     transmute(
@@ -168,14 +168,14 @@ initial_conditions_run_and_plot <- function(run_name, x1_initial, x2_initial, x3
       )
     )
   
-  ylim_max <- simulation_plot_df %>%
+  ylim_max <- simulation_df_long %>%
     summarize(max_concentration = round(max(concentration))) %>%
     pull(max_concentration)
   
-  friendly_df <- simulation_plot_df %>%
+  simulation_df_wide <- simulation_df_long %>%
     pivot_wider(names_from = "metabolite", values_from = "concentration")
   
-  simulation_plot <- simulation_plot_df %>%
+  simulation_plot <- simulation_df_long %>%
     ggplot(aes(x = t_minutes, y = concentration, color = metabolite)) +
     geom_line(linewidth = 1) +
     ylim(-0.1, ylim_max) +
@@ -185,7 +185,12 @@ initial_conditions_run_and_plot <- function(run_name, x1_initial, x2_initial, x3
       title = simulation_plot_title
     )
   
-  list(friendly_df = friendly_df, simulation_plot = simulation_plot, run_name = run_name)
+  list(
+    simulation_df_wide = simulation_df_wide,
+    simulation_df_long = simulation_df_long,
+    simulation_plot = simulation_plot, 
+    run_name = run_name
+  )
 }
 
 write_plots <- function(results_list) {
@@ -196,10 +201,19 @@ write_plots <- function(results_list) {
   })
 }
 
-combine_simulations_dfs <- function(results_list) {
+combine_simulation_wide_dfs <- function(results_list) {
   list_rbind(
     map(results_list, function(.x) {
-      .x[["friendly_df"]] %>%
+      .x[["simulation_df_wide"]] %>%
+        mutate(run_name = .x[["run_name"]])
+    })
+  )
+}
+
+combine_simulation_long_dfs <- function(results_list) {
+  list_rbind(
+    map(results_list, function(.x) {
+      .x[["simulation_df_long"]] %>%
         mutate(run_name = .x[["run_name"]])
     })
   )
