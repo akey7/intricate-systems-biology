@@ -88,19 +88,21 @@ run_euler <- function(simulation_df, h42 = 0.75) {
   )
 }
 
-cross_initial_conditions <- function(x1, x2, x3, x4, x5) {
-  x1_initial_df <- data.frame(x1 = x1)
-  x2_initial_df <- data.frame(x2 = x2)
-  x3_initial_df <- data.frame(x3 = x3)
-  x4_initial_df <- data.frame(x4 = x4)
-  x5_initial_df <- data.frame(x5 = x5)
+cross_initial_conditions <- function(x1, x2, x3, x4, x5, h42) {
+  x1_df <- data.frame(x1 = x1)
+  x2_df <- data.frame(x2 = x2)
+  x3_df <- data.frame(x3 = x3)
+  x4_df <- data.frame(x4 = x4)
+  x5_df <- data.frame(x5 = x5)
+  h42_df <- data.frame(h42 = h42)
   
   initial_condition_df <- crossing(
-    x1_initial_df, 
-    x2_initial_df, 
-    x3_initial_df,
-    x4_initial_df,
-    x5_initial_df
+    x1_df, 
+    x2_df, 
+    x3_df,
+    x4_df,
+    x5_df,
+    h42_df
   )
 }
 
@@ -121,6 +123,7 @@ create_run_specs <- function(initial_condition_df) {
     run_specs[[i]] <- vector(mode = "list", length = 2)
     run_specs[[i]][["ics"]] <- initial_condition_vec
     run_specs[[i]][["run_name"]] <- paste("run", serial, sep = "_")
+    run_specs[[i]][["h42"]] <- as.double(initial_condition_df[i, "h42"])
     
     serial <- serial + 1
   }
@@ -128,7 +131,7 @@ create_run_specs <- function(initial_condition_df) {
   run_specs
 }
 
-initial_conditions_run_and_plot <- function(run_name, x1_initial, x2_initial, x3_initial, x4_initial, x5_initial) {
+initial_conditions_run_and_plot <- function(run_name, x1_initial, x2_initial, x3_initial, x4_initial, x5_initial, h42) {
   simulation_df <- initial_conditions(
       x1_initial = x1_initial, 
       x2_initial = x2_initial, 
@@ -137,7 +140,7 @@ initial_conditions_run_and_plot <- function(run_name, x1_initial, x2_initial, x3
       x5_initial = x5_initial
     ) %>%
     turn_input2_off_and_on() %>%
-    run_euler()
+    run_euler(h42 = h42)
   
   simulation_df_long <- simulation_df %>%
     pivot_longer(starts_with("x"), values_to = "concentration", names_to = "xi") %>%
@@ -177,7 +180,8 @@ initial_conditions_run_and_plot <- function(run_name, x1_initial, x2_initial, x3
     simulation_df_wide = simulation_df_wide,
     simulation_df_long = simulation_df_long,
     simulation_plot = simulation_plot, 
-    run_name = run_name
+    run_name = run_name,
+    h42 = h42
   )
 }
 
@@ -211,6 +215,7 @@ star_schema <- function(results_list) {
         head(1) %>%
         transmute(
           run_name = .x[["run_name"]],
+          h42 = .x[["h42"]],
           initial_G6P = G6P,
           intial_FBP = FBP,
           intial_3_PGA = `3_PGA`,
