@@ -48,13 +48,14 @@ initial_condition_df <- cross_initial_conditions(
 )
 
 run_specs <- create_run_specs(head(initial_condition_df))
+# run_specs <- create_run_specs(initial_condition_df)
 ```
 
 ## Use doParallel to Create All Plots
 
 ```{r}
-# cl <- makeCluster(3, type='PSOCK')
-cl <- makeCluster(4, type='PSOCK')
+# cl <- makeCluster(4, type='PSOCK')
+cl <- makeCluster(3, type='PSOCK')
 registerDoParallel(cl)
 
 results <- foreach(i=1:length(run_specs), .packages = "tidyverse") %dopar% {
@@ -68,7 +69,6 @@ results <- foreach(i=1:length(run_specs), .packages = "tidyverse") %dopar% {
   )
 }
 
-# turn parallel processing off and run sequentially again:
 registerDoSEQ()
 ```
 
@@ -82,9 +82,17 @@ results[[1]][["run_name"]]
 results[[1]][["simulation_plot"]]
 ```
 
-## Write the plots and csvs to the filesystem.
+## Write csvs
 
 ```{r}
-write_csvs_and_plots(results)
+star_schema_dfs <- star_schema(results)
+write_csv(star_schema_dfs[["run_timeseries_wide"]], here("output", "run_timeseries_wide.csv"), col_names = TRUE, na = "")
+write_csv(star_schema_dfs[["run_timeseries_long"]], here("output", "run_timeseries_long.csv"), col_names = TRUE, na = "")
+write_csv(star_schema_dfs[["run_metadata"]], here("output", "run_metadata.csv"), col_names = TRUE, na = "")
 ```
 
+## Write the plots on the same y axis
+
+```{r}
+write_plots(results)
+```

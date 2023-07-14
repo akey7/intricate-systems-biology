@@ -139,24 +139,12 @@ initial_conditions_run_and_plot <- function(run_name, x1_initial, x2_initial, x3
     turn_input2_off_and_on() %>%
     run_euler()
   
-  simulation_plot_title <- paste(
-    "ICs:",
-    paste(
-      x1_initial,
-      x2_initial,
-      x3_initial,
-      x4_initial,
-      x5_initial,
-      sep = ", "
-    ),
-    sep = " "
-  )
-  
-  simulation_plot_df <- simulation_df %>%
-    select(-input1, -input2) %>%
-    pivot_longer(-t_minutes, values_to = "concentration", names_to = "xi") %>%
+  simulation_df_long <- simulation_df %>%
+    pivot_longer(starts_with("x"), values_to = "concentration", names_to = "xi") %>%
     transmute(
       t_minutes,
+      input1,
+      input2,
       concentration,
       "metabolite" = case_when(
         xi == "x1" ~ "G6P",
@@ -168,28 +156,74 @@ initial_conditions_run_and_plot <- function(run_name, x1_initial, x2_initial, x3
       )
     )
   
-  friendly_df <- simulation_plot_df %>%
+  ylim_max <- simulation_df_long %>%
+    summarize(max_concentration = round(max(concentration))) %>%
+    pull(max_concentration)
+  
+  simulation_df_wide <- simulation_df_long %>%
     pivot_wider(names_from = "metabolite", values_from = "concentration")
   
-  simulation_plot <- simulation_plot_df %>%
+  simulation_plot <- simulation_df_long %>%
     ggplot(aes(x = t_minutes, y = concentration, color = metabolite)) +
     geom_line(linewidth = 1) +
+    ylim(-0.1, ylim_max) +
     labs(
       x = "t (minutes)",
       y = "concentration (au)",
-      title = simulation_plot_title
+      title = run_name
     )
   
-  list(friendly_df = friendly_df, simulation_plot = simulation_plot, run_name = run_name)
+  list(
+    simulation_df_wide = simulation_df_wide,
+    simulation_df_long = simulation_df_long,
+    simulation_plot = simulation_plot, 
+    run_name = run_name
+  )
 }
 
-write_csvs_and_plots <- function(results_list) {
+write_plots <- function(results_list) {
   walk(results_list, function(.x) {
-    csv_filename <- here("output", "csvs", paste(.x[["run_name"]], "csv", sep = "."))
     plot_filename <- here("output", "plots", paste(.x[["run_name"]], "png", sep = "."))
-    write_csv(.x[["friendly_df"]], csv_filename, col_names = TRUE, na = "")
-    print(paste("Wrote", csv_filename, sep = " "))
     ggsave(plot_filename, plot = .x[["simulation_plot"]], units = "in", dpi = 300, height = 3, width = 5)
-    print(paste("Wrote", plot_filename, sep = " "))
+    # print(paste("Wrote", plot_filename, sep = " "))
   })
 }
+
+star_schema <- function(results_list) {
+  run_timeseries_wide <- list_rbind(
+    map(results_list, function(.x) {
+      .x[["simulation_df_wide"]] %>%
+        mutate(run_name = .x[["run_name"]])
+    })
+  )
+  
+  run_timeseries_long <- list_rbind(
+    map(results_list, function(.x) {
+      .x[["simulation_df_long"]] %>%
+        mutate(run_name = .x[["run_name"]])
+    })
+  )
+  
+  run_metadata <- list_rbind(
+    map(results_list, function(.x) {
+      .x[["simulation_df_wide"]] %>%
+        arrange(t_minutes) %>%
+        head(1) %>%
+        transmute(
+          run_name = .x[["run_name"]],
+          initial_G6P = G6P,
+          intial_FBP = FBP,
+          intial_3_PGA = `3_PGA`,
+          initial_PEP = PEP,
+          initial_pyruvate = pyruvate,
+        )
+    })
+  )
+  
+  list(
+    run_timeseries_long = run_timeseries_long,
+    run_timeseries_wide = run_timeseries_wide,
+    run_metadata = run_metadata
+  )
+}
+
