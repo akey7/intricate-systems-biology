@@ -81,9 +81,15 @@ results[[1]][["run_name"]]
 results[[1]][["simulation_plot"]]
 ```
 
-## Write the plots and csvs to the filesystem.
+## Write csvs
+
+```{r}
+combined_results <- combine_simulations_dfs(results)
+write_csv(combined_results, here("output", "combined_results.csv"), col_names = TRUE, na = "")
+```
+
+## Write the plots on the same y axis
 
 ```{r}
 write_plots(results)
 ```
-
