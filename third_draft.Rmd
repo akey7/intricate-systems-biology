@@ -54,7 +54,8 @@ run_specs <- create_run_specs(initial_condition_df)
 ## Use doParallel to Create All Plots
 
 ```{r}
-cl <- makeCluster(4, type='PSOCK')
+# cl <- makeCluster(4, type='PSOCK')
+cl <- makeCluster(3, type='PSOCK')
 registerDoParallel(cl)
 
 results <- foreach(i=1:length(run_specs), .packages = "tidyverse") %dopar% {
@@ -84,8 +85,10 @@ results[[1]][["simulation_plot"]]
 ## Write csvs
 
 ```{r}
-combined_results <- combine_simulations_dfs(results)
-write_csv(combined_results, here("output", "combined_results.csv"), col_names = TRUE, na = "")
+combined_results_wide <- combine_simulation_wide_dfs(results)
+combined_results_long <- combine_simulation_long_dfs(results)
+write_csv(combined_results_wide, here("output", "combined_results_wide.csv"), col_names = TRUE, na = "")
+write_csv(combined_results_long, here("output", "combined_results_long.csv"), col_names = TRUE, na = "")
 ```
 
 ## Write the plots on the same y axis
