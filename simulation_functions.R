@@ -168,12 +168,17 @@ initial_conditions_run_and_plot <- function(run_name, x1_initial, x2_initial, x3
       )
     )
   
+  ylim_max <- simulation_plot_df %>%
+    summarize(max_concentration = round(max(concentration))) %>%
+    pull(max_concentration)
+  
   friendly_df <- simulation_plot_df %>%
     pivot_wider(names_from = "metabolite", values_from = "concentration")
   
   simulation_plot <- simulation_plot_df %>%
     ggplot(aes(x = t_minutes, y = concentration, color = metabolite)) +
     geom_line(linewidth = 1) +
+    ylim(-0.1, ylim_max) +
     labs(
       x = "t (minutes)",
       y = "concentration (au)",
@@ -183,22 +188,19 @@ initial_conditions_run_and_plot <- function(run_name, x1_initial, x2_initial, x3
   list(friendly_df = friendly_df, simulation_plot = simulation_plot, run_name = run_name)
 }
 
-# write_csvs_and_plots <- function(results_list) {
-#   walk(results_list, function(.x) {
-#     csv_filename <- here("output", "csvs", paste(.x[["run_name"]], "csv", sep = "."))
-#     plot_filename <- here("output", "plots", paste(.x[["run_name"]], "png", sep = "."))
-#     write_csv(.x[["friendly_df"]], csv_filename, col_names = TRUE, na = "")
-#     print(paste("Wrote", csv_filename, sep = " "))
-#     ggsave(plot_filename, plot = .x[["simulation_plot"]], units = "in", dpi = 300, height = 3, width = 5)
-#     print(paste("Wrote", plot_filename, sep = " "))
-#   })
-# }
-
 write_plots <- function(results_list) {
   walk(results_list, function(.x) {
     plot_filename <- here("output", "plots", paste(.x[["run_name"]], "png", sep = "."))
     ggsave(plot_filename, plot = .x[["simulation_plot"]], units = "in", dpi = 300, height = 3, width = 5)
-    print(paste("Wrote", plot_filename, sep = " "))
+    # print(paste("Wrote", plot_filename, sep = " "))
   })
 }
 
+combine_simulations_dfs <- function(results_list) {
+  list_rbind(
+    map(results_list, function(.x) {
+      .x[["friendly_df"]] %>%
+        mutate(run_name = .x[["run_name"]])
+    })
+  )
+}
