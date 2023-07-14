@@ -153,10 +153,11 @@ initial_conditions_run_and_plot <- function(run_name, x1_initial, x2_initial, x3
   )
   
   simulation_df_long <- simulation_df %>%
-    select(-input1, -input2) %>%
-    pivot_longer(-t_minutes, values_to = "concentration", names_to = "xi") %>%
+    pivot_longer(starts_with("x"), values_to = "concentration", names_to = "xi") %>%
     transmute(
       t_minutes,
+      input1,
+      input2,
       concentration,
       "metabolite" = case_when(
         xi == "x1" ~ "G6P",
