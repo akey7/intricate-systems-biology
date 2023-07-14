@@ -139,19 +139,6 @@ initial_conditions_run_and_plot <- function(run_name, x1_initial, x2_initial, x3
     turn_input2_off_and_on() %>%
     run_euler()
   
-  simulation_plot_title <- paste(
-    "ICs:",
-    paste(
-      x1_initial,
-      x2_initial,
-      x3_initial,
-      x4_initial,
-      x5_initial,
-      sep = ", "
-    ),
-    sep = " "
-  )
-  
   simulation_df_long <- simulation_df %>%
     pivot_longer(starts_with("x"), values_to = "concentration", names_to = "xi") %>%
     transmute(
@@ -183,7 +170,7 @@ initial_conditions_run_and_plot <- function(run_name, x1_initial, x2_initial, x3
     labs(
       x = "t (minutes)",
       y = "concentration (au)",
-      title = simulation_plot_title
+      title = run_name
     )
   
   list(
