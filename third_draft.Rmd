@@ -47,8 +47,8 @@ initial_condition_df <- cross_initial_conditions(
   x5 = c(0.75, 1, 1.25)
 )
 
-# run_specs <- create_run_specs(head(initial_condition_df))
-run_specs <- create_run_specs(initial_condition_df)
+run_specs <- create_run_specs(head(initial_condition_df))
+# run_specs <- create_run_specs(initial_condition_df)
 ```
 
 ## Use doParallel to Create All Plots
@@ -85,10 +85,10 @@ results[[1]][["simulation_plot"]]
 ## Write csvs
 
 ```{r}
-combined_results_wide <- combine_simulation_wide_dfs(results)
-combined_results_long <- combine_simulation_long_dfs(results)
-write_csv(combined_results_wide, here("output", "combined_results_wide.csv"), col_names = TRUE, na = "")
-write_csv(combined_results_long, here("output", "combined_results_long.csv"), col_names = TRUE, na = "")
+star_schema_dfs <- star_schema(results)
+write_csv(star_schema_dfs[["run_timeseries_wide"]], here("output", "run_timeseries_wide.csv"), col_names = TRUE, na = "")
+write_csv(star_schema_dfs[["run_timeseries_long"]], here("output", "run_timeseries_long.csv"), col_names = TRUE, na = "")
+write_csv(star_schema_dfs[["run_metadata"]], here("output", "run_metadata.csv"), col_names = TRUE, na = "")
 ```
 
 ## Write the plots on the same y axis
