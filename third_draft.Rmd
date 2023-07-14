@@ -84,6 +84,6 @@ results[[1]][["simulation_plot"]]
 ## Write the plots and csvs to the filesystem.
 
 ```{r}
-write_csvs_and_plots(results)
+write_plots(results)
 ```
 
