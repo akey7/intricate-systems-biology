@@ -44,7 +44,11 @@ initial_condition_df <- cross_initial_conditions(
   x2 = c(0.75, 1, 1.25),
   x3 = c(0.75, 1, 1.25),
   x4 = c(0.75, 1, 1.25),
-  x5 = c(0.75, 1, 1.25)
+  x5 = c(0.75, 1, 1.25),
+  h42 = c(0.5, 0.75, 1)
+  # input2_cutoff_min = c(-1, 10),
+  # input2_cutin_min = c(60),
+  # input2_cutoff_level = c(0.0)
 )
 
 run_specs <- create_run_specs(head(initial_condition_df))
@@ -65,21 +69,12 @@ results <- foreach(i=1:length(run_specs), .packages = "tidyverse") %dopar% {
     x2_initial = run_specs[[i]][["ics"]][[2]],
     x3_initial = run_specs[[i]][["ics"]][[3]],
     x4_initial = run_specs[[i]][["ics"]][[4]],
-    x5_initial = run_specs[[i]][["ics"]][[5]]
+    x5_initial = run_specs[[i]][["ics"]][[5]],
+    h42 = run_specs[[i]][["h42"]]
   )
 }
 
 registerDoSEQ()
-```
-
-## Display a run name and sample plot
-
-```{r}
-results[[1]][["run_name"]]
-```
-
-```{r}
-results[[1]][["simulation_plot"]]
 ```
 
 ## Write csvs
