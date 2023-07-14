@@ -189,20 +189,41 @@ write_plots <- function(results_list) {
   })
 }
 
-combine_simulation_wide_dfs <- function(results_list) {
-  list_rbind(
+star_schema <- function(results_list) {
+  run_timeseries_wide <- list_rbind(
     map(results_list, function(.x) {
       .x[["simulation_df_wide"]] %>%
         mutate(run_name = .x[["run_name"]])
     })
   )
-}
-
-combine_simulation_long_dfs <- function(results_list) {
-  list_rbind(
+  
+  run_timeseries_long <- list_rbind(
     map(results_list, function(.x) {
       .x[["simulation_df_long"]] %>%
         mutate(run_name = .x[["run_name"]])
     })
   )
+  
+  run_metadata <- list_rbind(
+    map(results_list, function(.x) {
+      .x[["simulation_df_wide"]] %>%
+        arrange(t_minutes) %>%
+        head(1) %>%
+        transmute(
+          run_name = .x[["run_name"]],
+          initial_G6P = G6P,
+          intial_FBP = FBP,
+          intial_3_PGA = `3_PGA`,
+          initial_PEP = PEP,
+          initial_pyruvate = pyruvate,
+        )
+    })
+  )
+  
+  list(
+    run_timeseries_long = run_timeseries_long,
+    run_timeseries_wide = run_timeseries_wide,
+    run_metadata = run_metadata
+  )
 }
+
