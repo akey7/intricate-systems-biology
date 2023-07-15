@@ -45,7 +45,7 @@ turn_input2_off_and_on <- function(simulation_df, off_at_min = 10, on_at_min = 6
   after_cutoff <- simulation_df$input2[on_index:nrow(simulation_df)]
   downtime <- rep_len(cutoff_level, length.out = on_index - off_index)
   new_input2 <- c(before_cutoff, downtime, after_cutoff)
-  
+
   simulation_df %>%
     mutate(input2 = new_input2)
 }
@@ -88,19 +88,25 @@ run_euler <- function(simulation_df, h42 = 0.75) {
   )
 }
 
-cross_initial_conditions <- function(x1, x2, x3, x4, x5) {
-  x1_initial_df <- data.frame(x1 = x1)
-  x2_initial_df <- data.frame(x2 = x2)
-  x3_initial_df <- data.frame(x3 = x3)
-  x4_initial_df <- data.frame(x4 = x4)
-  x5_initial_df <- data.frame(x5 = x5)
+cross_initial_conditions <- function(x1, x2, x3, x4, x5, h42, input2_off_at_min, input2_on_at_min) {
+  x1_df <- data.frame(x1 = x1)
+  x2_df <- data.frame(x2 = x2)
+  x3_df <- data.frame(x3 = x3)
+  x4_df <- data.frame(x4 = x4)
+  x5_df <- data.frame(x5 = x5)
+  h42_df <- data.frame(h42 = h42)
+  input2_off_at_min_df <- data.frame(input2_off_at_min = input2_off_at_min)
+  input2_on_at_min_df <- data.frame(input2_on_at_min = input2_on_at_min)
   
   initial_condition_df <- crossing(
-    x1_initial_df, 
-    x2_initial_df, 
-    x3_initial_df,
-    x4_initial_df,
-    x5_initial_df
+    x1_df, 
+    x2_df, 
+    x3_df,
+    x4_df,
+    x5_df,
+    h42_df,
+    input2_off_at_min_df,
+    input2_on_at_min_df
   )
 }
 
@@ -110,8 +116,7 @@ create_run_specs <- function(initial_condition_df) {
   serial <- 1
   
   for (i in 1:nrow(initial_condition_df)) {
-    initial_condition_vec <- vector(mode = "numeric", length = length(initial_condition_df))
-    
+    initial_condition_vec <- numeric(5)
     initial_condition_vec[1] <- initial_condition_df[i, "x1"]
     initial_condition_vec[2] <- initial_condition_df[i, "x2"]
     initial_condition_vec[3] <- initial_condition_df[i, "x3"]
@@ -121,6 +126,9 @@ create_run_specs <- function(initial_condition_df) {
     run_specs[[i]] <- vector(mode = "list", length = 2)
     run_specs[[i]][["ics"]] <- initial_condition_vec
     run_specs[[i]][["run_name"]] <- paste("run", serial, sep = "_")
+    run_specs[[i]][["h42"]] <- as.double(initial_condition_df[i, "h42"])
+    run_specs[[i]][["input2_off_at_min"]] <- as.double(initial_condition_df[i, "input2_off_at_min"])
+    run_specs[[i]][["input2_on_at_min"]] <- as.double(initial_condition_df[i, "input2_on_at_min"])
     
     serial <- serial + 1
   }
@@ -128,7 +136,7 @@ create_run_specs <- function(initial_condition_df) {
   run_specs
 }
 
-initial_conditions_run_and_plot <- function(run_name, x1_initial, x2_initial, x3_initial, x4_initial, x5_initial) {
+initial_conditions_run_and_plot <- function(run_name, x1_initial, x2_initial, x3_initial, x4_initial, x5_initial, h42, input2_off_at_min, input2_on_at_min) {
   simulation_df <- initial_conditions(
       x1_initial = x1_initial, 
       x2_initial = x2_initial, 
@@ -136,8 +144,8 @@ initial_conditions_run_and_plot <- function(run_name, x1_initial, x2_initial, x3
       x4_initial = x4_initial, 
       x5_initial = x5_initial
     ) %>%
-    turn_input2_off_and_on() %>%
-    run_euler()
+    turn_input2_off_and_on(off_at_min = input2_off_at_min, on_at_min = input2_on_at_min) %>%
+    run_euler(h42 = h42)
   
   simulation_df_long <- simulation_df %>%
     pivot_longer(starts_with("x"), values_to = "concentration", names_to = "xi") %>%
@@ -156,17 +164,12 @@ initial_conditions_run_and_plot <- function(run_name, x1_initial, x2_initial, x3
       )
     )
   
-  ylim_max <- simulation_df_long %>%
-    summarize(max_concentration = round(max(concentration))) %>%
-    pull(max_concentration)
-  
   simulation_df_wide <- simulation_df_long %>%
     pivot_wider(names_from = "metabolite", values_from = "concentration")
   
   simulation_plot <- simulation_df_long %>%
     ggplot(aes(x = t_minutes, y = concentration, color = metabolite)) +
     geom_line(linewidth = 1) +
-    ylim(-0.1, ylim_max) +
     labs(
       x = "t (minutes)",
       y = "concentration (au)",
@@ -177,7 +180,10 @@ initial_conditions_run_and_plot <- function(run_name, x1_initial, x2_initial, x3
     simulation_df_wide = simulation_df_wide,
     simulation_df_long = simulation_df_long,
     simulation_plot = simulation_plot, 
-    run_name = run_name
+    run_name = run_name,
+    h42 = h42,
+    input2_off_at_min = input2_off_at_min,
+    input2_on_at_min = input2_on_at_min
   )
 }
 
@@ -211,6 +217,9 @@ star_schema <- function(results_list) {
         head(1) %>%
         transmute(
           run_name = .x[["run_name"]],
+          h42 = .x[["h42"]],
+          input2_off_at_min = .x[["input2_off_at_min"]],
+          input2_on_at_min = .x[["input2_on_at_min"]],
           initial_G6P = G6P,
           intial_FBP = FBP,
           intial_3_PGA = `3_PGA`,
