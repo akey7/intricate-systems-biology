@@ -47,7 +47,7 @@ initial_condition_df <- cross_initial_conditions(
   x5 = c(1),
   h42 = c(0.5, 0.75, 1),
   input2_off_at_min = c(10, 20, 30),
-  input2_on_at_min = c(40, 50, 60)
+  input2_on_at_min = c(40, 60, 100)
 )
 
 run_specs <- create_run_specs(initial_condition_df)
