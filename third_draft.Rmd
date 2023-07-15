@@ -20,7 +20,7 @@ library(purrr)
 library(readr)
 library(doParallel)
 library(here)
-source("simulation_functions.R")
+source("simulation_core.R")
 ```
 
 ## Make a theme for the plots
@@ -50,7 +50,8 @@ initial_condition_df <- cross_initial_conditions(
   input2_on_at_min = c(40, 50, 60)
 )
 
-run_specs <- create_run_specs(initial_condition_df)
+# run_specs <- create_run_specs(initial_condition_df)
+run_specs <- create_run_specs(head(initial_condition_df))
 ```
 
 ## Use doParallel to Create All Plots
