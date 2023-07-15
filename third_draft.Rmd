@@ -40,18 +40,18 @@ theme_set(
 
 ```{r}
 initial_condition_df <- cross_initial_conditions(
-  x1 = c(0.75, 1, 1.25),
-  x2 = c(0.75, 1, 1.25),
-  x3 = c(0.75, 1, 1.25),
-  x4 = c(0.75, 1, 1.25),
-  x5 = c(0.75, 1, 1.25),
-  h42 = c(0.5, 0.75, 1),
-  input2_off_at_min = c(-1, 10, 20),  # -1 means do not turn off input2
-  input2_on_at_min = c(-1, 40, 60)
+  x1 = c(0.75, 1.25),
+  x2 = c(0.75, 1.25),
+  x3 = c(0.75, 1.25),
+  x4 = c(0.75, 1.25),
+  x5 = c(0.75, 1.25),
+  h42 = c(0.75, 1),
+  input2_off_at_min = c(10),  # -1 means do not turn off input2
+  input2_on_at_min = c(60)
 )
 
-run_specs <- create_run_specs(head(initial_condition_df))
-# run_specs <- create_run_specs(initial_condition_df)
+# run_specs <- create_run_specs(head(initial_condition_df))
+run_specs <- create_run_specs(initial_condition_df)
 ```
 
 ## Use doParallel to Create All Plots
