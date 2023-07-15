@@ -41,9 +41,9 @@ theme_set(
 ```{r}
 initial_condition_df <- cross_initial_conditions(
   x1 = c(1),
-  x2 = c(1),
+  x2 = c(0.75, 1, 1.25),
   x3 = c(1),
-  x4 = c(1),
+  x4 = c(0.75, 1, 1.25),
   x5 = c(1),
   h42 = c(0.5, 0.75, 1),
   input2_off_at_min = c(10, 20, 30),
