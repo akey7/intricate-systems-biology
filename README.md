@@ -37,3 +37,5 @@ Under the conditions stated above, the time evolution of reactant concentration 
 
 - `simulation_core.R`: These are the functions that run the simulation. This file is not enough to run the simulation. It requires one of the other files below to include it.
 
+- `simulation_runner.Rmd`: This is a friendlier interface that runs the function in `simulation_core.R` in parallel to execute the simulations.
+
