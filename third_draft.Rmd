@@ -45,10 +45,9 @@ initial_condition_df <- cross_initial_conditions(
   x3 = c(0.75, 1, 1.25),
   x4 = c(0.75, 1, 1.25),
   x5 = c(0.75, 1, 1.25),
-  h42 = c(0.5, 0.75, 1)
-  # input2_cutoff_min = c(-1, 10),
-  # input2_cutin_min = c(60),
-  # input2_cutoff_level = c(0.0)
+  h42 = c(0.5, 0.75, 1),
+  input2_off_at_min = c(-1, 10, 20),  # -1 means do not turn off input2
+  input2_on_at_min = c(-1, 40, 60)
 )
 
 run_specs <- create_run_specs(head(initial_condition_df))
@@ -58,7 +57,6 @@ run_specs <- create_run_specs(head(initial_condition_df))
 ## Use doParallel to Create All Plots
 
 ```{r}
-# cl <- makeCluster(4, type='PSOCK')
 cl <- makeCluster(3, type='PSOCK')
 registerDoParallel(cl)
 
@@ -70,7 +68,9 @@ results <- foreach(i=1:length(run_specs), .packages = "tidyverse") %dopar% {
     x3_initial = run_specs[[i]][["ics"]][[3]],
     x4_initial = run_specs[[i]][["ics"]][[4]],
     x5_initial = run_specs[[i]][["ics"]][[5]],
-    h42 = run_specs[[i]][["h42"]]
+    h42 = run_specs[[i]][["h42"]],
+    input2_off_at_min = run_specs[[i]][["input2_off_at_min"]],
+    input2_on_at_min = run_specs[[i]][["input2_on_at_min"]]
   )
 }
 
