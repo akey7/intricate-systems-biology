@@ -38,21 +38,16 @@ initial_conditions <- function(
 }
 
 turn_input2_off_and_on <- function(simulation_df, off_at_min = 10, on_at_min = 60, cutoff_level = 0.0) {
-  if (off_at_min == -1 || on_at_min == -1) {
-    simulation_df
-  }
-  else {
-    timestep <- simulation_df[2, "t_minutes"] - simulation_df[1, "t_minutes"]
-    off_index <- off_at_min / timestep
-    on_index <- on_at_min / timestep
-    before_cutoff <- simulation_df$input2[1:off_index - 1]
-    after_cutoff <- simulation_df$input2[on_index:nrow(simulation_df)]
-    downtime <- rep_len(cutoff_level, length.out = on_index - off_index)
-    new_input2 <- c(before_cutoff, downtime, after_cutoff)
+  timestep <- simulation_df[2, "t_minutes"] - simulation_df[1, "t_minutes"]
+  off_index <- off_at_min / timestep
+  on_index <- on_at_min / timestep
+  before_cutoff <- simulation_df$input2[1:off_index - 1]
+  after_cutoff <- simulation_df$input2[on_index:nrow(simulation_df)]
+  downtime <- rep_len(cutoff_level, length.out = on_index - off_index)
+  new_input2 <- c(before_cutoff, downtime, after_cutoff)
 
-    simulation_df %>%
-      mutate(input2 = new_input2)
-  }
+  simulation_df %>%
+    mutate(input2 = new_input2)
 }
 
 run_euler <- function(simulation_df, h42 = 0.75) {
