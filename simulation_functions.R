@@ -164,17 +164,12 @@ initial_conditions_run_and_plot <- function(run_name, x1_initial, x2_initial, x3
       )
     )
   
-  ylim_max <- simulation_df_long %>%
-    summarize(max_concentration = round(max(concentration))) %>%
-    pull(max_concentration)
-  
   simulation_df_wide <- simulation_df_long %>%
     pivot_wider(names_from = "metabolite", values_from = "concentration")
   
   simulation_plot <- simulation_df_long %>%
     ggplot(aes(x = t_minutes, y = concentration, color = metabolite)) +
     geom_line(linewidth = 1) +
-    ylim(-0.1, ylim_max) +
     labs(
       x = "t (minutes)",
       y = "concentration (au)",
