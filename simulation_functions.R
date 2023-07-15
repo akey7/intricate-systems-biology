@@ -49,7 +49,7 @@ turn_input2_off_and_on <- function(simulation_df, off_at_min = 10, on_at_min = 6
     after_cutoff <- simulation_df$input2[on_index:nrow(simulation_df)]
     downtime <- rep_len(cutoff_level, length.out = on_index - off_index)
     new_input2 <- c(before_cutoff, downtime, after_cutoff)
-    
+
     simulation_df %>%
       mutate(input2 = new_input2)
   }
