@@ -25,6 +25,15 @@ Under the conditions stated above, the time evolution of reactant concentration 
 
 ![](img/default_trajectory.png)
 
+## How to Run The Model
 
+### Dependencies
 
+- `tidyverse`
+- `here`
+- `doParallel`
+
+### Source Files and What They Do
+
+- `simulation_functions.R`: These are the functions that run the simulation. This file is not enough to run the simulation. It requires one of the other files below to include it.
 
