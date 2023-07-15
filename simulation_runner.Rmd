@@ -1,5 +1,5 @@
 ---
-title: "Third Draft"
+title: "Simulation Runner"
 output: html_document
 date: "`r Sys.Date()`"
 ---
@@ -94,17 +94,14 @@ results <- foreach(i=1:length(run_specs), .packages = "tidyverse") %dopar% {
 registerDoSEQ()
 ```
 
-### Write csvs
+### Write csvs and plots
 
 ```{r}
 star_schema_dfs <- star_schema(results)
+
 write_csv(star_schema_dfs[["run_timeseries_wide"]], here("output", "run_timeseries_wide.csv"), col_names = TRUE, na = "")
 write_csv(star_schema_dfs[["run_timeseries_long"]], here("output", "run_timeseries_long.csv"), col_names = TRUE, na = "")
 write_csv(star_schema_dfs[["run_metadata"]], here("output", "run_metadata.csv"), col_names = TRUE, na = "")
-```
 
-### Write the plots
-
-```{r}
 write_plots(results)
 ```
