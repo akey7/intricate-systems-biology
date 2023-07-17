@@ -8,8 +8,8 @@ initial_conditions <- function(
     x3_initial = 1.0, 
     x4_initial = 1.0, 
     x5_initial = 1.0,
-    input1_initial = 0.1,
-    input2_initial = 0.99
+    input1_initial = 0.025,
+    input2_initial = 0.975
   ) {
   t_minutes <- seq(0, length_minutes, by = step_size_minutes)
   
