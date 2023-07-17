@@ -1,0 +1,107 @@
+---
+title: "Simulation Runner"
+output: html_document
+date: "`r Sys.Date()`"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load libraries and simulation functions
+
+```{r}
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(tidyr))
+suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(purrr))
+suppressPackageStartupMessages(library(readr))
+suppressPackageStartupMessages(library(doParallel))
+suppressPackageStartupMessages(library(here))
+source("simulation_core.R")
+```
+
+## Setup Simulation Options
+
+### 1. Initial Values and Other Parameters
+
+Here, you can specify the parameter values to search as vectors supplied to the x1, x2, ..., input2_on_at_min arguments.
+
+Also, specify the number of cores for the parallel computation.
+
+Suggestion: Start with a limited number of parameters in each vector before you run huge numbers of parameters. Look for the output from this cell to find how many simulations you have requested.
+
+```{r}
+initial_condition_df <- cross_initial_conditions(
+  x1 = c(1),
+  x2 = c(0.75, 1, 1.25),
+  x3 = c(1),
+  x4 = c(0.75, 1, 1.25),
+  x5 = c(1),
+  h42 = c(0.5, 0.75, 1),
+  input2_off_at_min = c(10, 30),
+  input2_on_at_min = c(32, 60)
+)
+
+print(paste("Number of simulations requested:", nrow(initial_condition_df), sep = " "))
+
+run_specs <- create_run_specs(initial_condition_df)
+```
+
+### 2. Make a ggplot theme for the plots
+
+```{r}
+theme_set(
+  theme_linedraw() +
+    theme(
+      plot.title = element_text(size = 18, face = "bold"),
+      axis.title = element_text(size = 12, face = "bold"),
+      axis.text = element_text(size = 9)
+    )
+)
+```
+
+### 3. Set number of cores for computation
+
+Set this to a value appropriate for your processor.
+
+```{r}
+num_cores <- 3
+```
+
+## DO NOT MODIFY BELOW THIS LINE
+
+### Create all plots in parallel
+
+```{r}
+cl <- makeCluster(num_cores, type='PSOCK')
+registerDoParallel(cl)
+
+results <- foreach(i=1:length(run_specs), .packages = "tidyverse") %dopar% {
+  initial_conditions_run_and_plot(
+    run_name = run_specs[[i]][["run_name"]],
+    x1_initial = run_specs[[i]][["ics"]][[1]],
+    x2_initial = run_specs[[i]][["ics"]][[2]],
+    x3_initial = run_specs[[i]][["ics"]][[3]],
+    x4_initial = run_specs[[i]][["ics"]][[4]],
+    x5_initial = run_specs[[i]][["ics"]][[5]],
+    h42 = run_specs[[i]][["h42"]],
+    input2_off_at_min = run_specs[[i]][["input2_off_at_min"]],
+    input2_on_at_min = run_specs[[i]][["input2_on_at_min"]]
+  )
+}
+
+registerDoSEQ()
+```
+
+### Write csvs and plots
+
+```{r}
+star_schema_dfs <- star_schema(results)
+
+write_csv(star_schema_dfs[["run_timeseries_wide"]], here("output", "run_timeseries_wide.csv"), col_names = TRUE, na = "")
+write_csv(star_schema_dfs[["run_timeseries_long"]], here("output", "run_timeseries_long.csv"), col_names = TRUE, na = "")
+write_csv(star_schema_dfs[["run_metadata"]], here("output", "run_metadata.csv"), col_names = TRUE, na = "")
+
+write_plots(results)
+```
