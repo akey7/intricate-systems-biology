@@ -66,7 +66,8 @@ theme_set(
 Set this to a value appropriate for your processor.
 
 ```{r}
-num_cores <- 3
+num_cores <- 56
+# num_cores <- 3
 ```
 
 ## DO NOT MODIFY BELOW THIS LINE
