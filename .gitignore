@@ -60,6 +60,7 @@ input/
 # Output data
 output/
 output_130/
+output_108/
 
 # Ignore intermediate HTML
 *.html
