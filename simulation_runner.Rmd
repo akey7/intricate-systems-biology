@@ -76,28 +76,9 @@ num_cores <- 56
 ### Create all plots in parallel
 
 ```{r}
-# suppressPackageStartupMessages(library(dplyr))
-# suppressPackageStartupMessages(library(tidyr))
-# suppressPackageStartupMessages(library(ggplot2))
-# suppressPackageStartupMessages(library(purrr))
-
 cl <- makeCluster(num_cores, type="PSOCK")
 registerDoParallel(cl)
-
 registerDoRNG(123)
-# results <- foreach(i=1:length(run_specs), .packages = "tidyverse") %dopar% {
-#   initial_conditions_run_and_plot(
-#     run_name = run_specs[[i]][["run_name"]],
-#     x1_initial = run_specs[[i]][["ics"]][[1]],
-#     x2_initial = run_specs[[i]][["ics"]][[2]],
-#     x3_initial = run_specs[[i]][["ics"]][[3]],
-#     x4_initial = run_specs[[i]][["ics"]][[4]],
-#     x5_initial = run_specs[[i]][["ics"]][[5]],
-#     h42 = run_specs[[i]][["h42"]],
-#     input2_off_at_min = run_specs[[i]][["input2_off_at_min"]],
-#     input2_on_at_min = run_specs[[i]][["input2_on_at_min"]]
-#   )
-# }
 
 results <- foreach(i=seq_along(run_specs), .packages = c("dplyr", "tidyr", "ggplot2")) %dopar% {
   run_spec <- run_specs[[i]]
