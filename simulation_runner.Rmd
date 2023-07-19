@@ -17,6 +17,7 @@ suppressPackageStartupMessages(library(ggplot2))
 suppressPackageStartupMessages(library(purrr))
 suppressPackageStartupMessages(library(readr))
 suppressPackageStartupMessages(library(doParallel))
+suppressPackageStartupMessages(library(doRNG))
 suppressPackageStartupMessages(library(here))
 source("simulation_core.R")
 ```
@@ -34,13 +35,13 @@ Suggestion: Start with a limited number of parameters in each vector before you 
 ```{r}
 initial_condition_df <- cross_initial_conditions(
   x1 = c(1),
-  x2 = c(0.75, 1, 1.25),
+  x2 = c(0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0),
   x3 = c(1),
-  x4 = c(0.75, 1, 1.25),
+  x4 = c(0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0),
   x5 = c(1),
-  h42 = c(0.5, 0.75, 1),
-  input2_off_at_min = c(10, 30),
-  input2_on_at_min = c(32, 60)
+  h42 = c(0.65, 0.675, 0.7, 0.725, 0.75, 0.775, 0.8, 0.825, 0.85),
+  input2_off_at_min = c(30),
+  input2_on_at_min = c(60)
 )
 
 print(paste("Number of simulations requested:", nrow(initial_condition_df), sep = " "))
@@ -75,20 +76,41 @@ num_cores <- 56
 ### Create all plots in parallel
 
 ```{r}
-cl <- makeCluster(num_cores, type='PSOCK')
+# suppressPackageStartupMessages(library(dplyr))
+# suppressPackageStartupMessages(library(tidyr))
+# suppressPackageStartupMessages(library(ggplot2))
+# suppressPackageStartupMessages(library(purrr))
+
+cl <- makeCluster(num_cores, type="PSOCK")
 registerDoParallel(cl)
 
-results <- foreach(i=1:length(run_specs), .packages = "tidyverse") %dopar% {
+registerDoRNG(123)
+# results <- foreach(i=1:length(run_specs), .packages = "tidyverse") %dopar% {
+#   initial_conditions_run_and_plot(
+#     run_name = run_specs[[i]][["run_name"]],
+#     x1_initial = run_specs[[i]][["ics"]][[1]],
+#     x2_initial = run_specs[[i]][["ics"]][[2]],
+#     x3_initial = run_specs[[i]][["ics"]][[3]],
+#     x4_initial = run_specs[[i]][["ics"]][[4]],
+#     x5_initial = run_specs[[i]][["ics"]][[5]],
+#     h42 = run_specs[[i]][["h42"]],
+#     input2_off_at_min = run_specs[[i]][["input2_off_at_min"]],
+#     input2_on_at_min = run_specs[[i]][["input2_on_at_min"]]
+#   )
+# }
+
+results <- foreach(i=seq_along(run_specs), .packages = c("dplyr", "tidyr", "ggplot2")) %dopar% {
+  run_spec <- run_specs[[i]]
   initial_conditions_run_and_plot(
-    run_name = run_specs[[i]][["run_name"]],
-    x1_initial = run_specs[[i]][["ics"]][[1]],
-    x2_initial = run_specs[[i]][["ics"]][[2]],
-    x3_initial = run_specs[[i]][["ics"]][[3]],
-    x4_initial = run_specs[[i]][["ics"]][[4]],
-    x5_initial = run_specs[[i]][["ics"]][[5]],
-    h42 = run_specs[[i]][["h42"]],
-    input2_off_at_min = run_specs[[i]][["input2_off_at_min"]],
-    input2_on_at_min = run_specs[[i]][["input2_on_at_min"]]
+    run_name = run_spec[["run_name"]],
+    x1_initial = run_spec[["ics"]][[1]],
+    x2_initial = run_spec[["ics"]][[2]],
+    x3_initial = run_spec[["ics"]][[3]],
+    x4_initial = run_spec[["ics"]][[4]],
+    x5_initial = run_spec[["ics"]][[5]],
+    h42 = run_spec[["h42"]],
+    input2_off_at_min = run_spec[["input2_off_at_min"]],
+    input2_on_at_min = run_spec[["input2_on_at_min"]]
   )
 }
 
