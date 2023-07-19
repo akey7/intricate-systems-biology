@@ -58,9 +58,7 @@ rsconnect/
 input/
 
 # Output data
-output/
-output_130/
-output_108/
+output_*/
 
 # Ignore intermediate HTML
 *.html
