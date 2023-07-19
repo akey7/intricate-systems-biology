@@ -16,8 +16,7 @@ suppressPackageStartupMessages(library(tidyr))
 suppressPackageStartupMessages(library(ggplot2))
 suppressPackageStartupMessages(library(purrr))
 suppressPackageStartupMessages(library(readr))
-suppressPackageStartupMessages(library(doParallel))
-suppressPackageStartupMessages(library(doRNG))
+suppressPackageStartupMessages(library(parallel))
 suppressPackageStartupMessages(library(here))
 source("simulation_core.R")
 ```
@@ -76,26 +75,39 @@ num_cores <- 56
 ### Create all plots in parallel
 
 ```{r}
-cl <- makeCluster(num_cores, type="PSOCK")
-registerDoParallel(cl)
-registerDoRNG(123)
+cl <- makeCluster(num_cores, type = "PSOCK") # 7596.613 ms on Threadripper, 56 workers
 
-results <- foreach(i=seq_along(run_specs), .packages = c("dplyr", "tidyr", "ggplot2")) %dopar% {
-  run_spec <- run_specs[[i]]
-  initial_conditions_run_and_plot(
-    run_name = run_spec[["run_name"]],
-    x1_initial = run_spec[["ics"]][[1]],
-    x2_initial = run_spec[["ics"]][[2]],
-    x3_initial = run_spec[["ics"]][[3]],
-    x4_initial = run_spec[["ics"]][[4]],
-    x5_initial = run_spec[["ics"]][[5]],
-    h42 = run_spec[["h42"]],
-    input2_off_at_min = run_spec[["input2_off_at_min"]],
-    input2_on_at_min = run_spec[["input2_on_at_min"]]
-  )
-}
+clusterEvalQ(cl, {
+  library(dplyr)
+  library(tidyr)
+  library(ggplot2)
+  source("simulation_core.R")
+}) # 1910.141 ms on Threadripper, 56 workers
 
-registerDoSEQ()
+clusterSetRNGStream(cl, iseed = 1234)  # 4.1063	ms on Threadripper, 56 workers
+
+results <- clusterApply(
+  cl,
+  run_specs,
+  function(run_spec) {
+    initial_conditions_run_and_plot(
+      run_name = run_spec[["run_name"]],
+      x1_initial = run_spec[["ics"]][[1]],
+      x2_initial = run_spec[["ics"]][[2]],
+      x3_initial = run_spec[["ics"]][[3]],
+      x4_initial = run_spec[["ics"]][[4]],
+      x5_initial = run_spec[["ics"]][[5]],
+      h42 = run_spec[["h42"]],
+      input2_off_at_min = run_spec[["input2_off_at_min"]],
+      input2_on_at_min = run_spec[["input2_on_at_min"]]
+    )
+  }
+)  
+
+# Above took 176946.2 ms on Threadripper, 56 workers, 576 tasks 
+# (note processor usage only spikes for a few seconds), 307 ms/task
+
+stopCluster(cl)  # 4.1195	ms on Threadripper, 56 workers
 ```
 
 ### Write csvs and plots
