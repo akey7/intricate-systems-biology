@@ -108,7 +108,6 @@ num_cores <- 3
 #       x3_initial = run_spec[["ics"]][[3]],
 #       x4_initial = run_spec[["ics"]][[4]],
 #       x5_initial = run_spec[["ics"]][[5]],
-#       # h42 = run_spec[["h42"]],
 #       input2_off_at_min = run_spec[["input2_off_at_min"]],
 #       input2_on_at_min = run_spec[["input2_on_at_min"]]
 #     )
