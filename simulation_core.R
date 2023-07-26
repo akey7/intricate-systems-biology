@@ -73,6 +73,12 @@ run_euler <- function(simulation_df) {
     input1 <- simulation_df[i, "input1"]
     input2 <- simulation_df[i, "input2"]
 
+    # x1[i] <- x1[i-1]+timestep*(input1+input2*x4[i-1]^0.5-x1[i-1]^0.5)
+    # x2[i] <- x2[i-1]+timestep*(x1[i-1]^0.5-x2[i-1]^0.75)
+    # x3[i] <- x3[i-1]+timestep*(2*x2[i-1]^0.75-2*x3[i-1]^0.4)
+    # x4[i] <- x4[i-1]+timestep*(2*x3[i-1]^0.4-input2*x4[i-1]^0.5-x2[i-1]^h42*x4[i-1]^0.5)
+    # x5[i] <- x5[i-1]+timestep*(x2[i-1]^h42*x4[i-1]^0.5-x5[i-1]^0.5)
+    
     x1[i] <- x1[i-1]+timestep*(input1+input2*x4[i-1]^0.5-x1[i-1]^0.5)
     x2[i] <- x2[i-1]+timestep*(x1[i-1]^0.5-x2[i-1]^0.75)
     x3[i] <- x3[i-1]+timestep*(2*x2[i-1]^0.75-2*x3[i-1]^0.4)
