@@ -9,7 +9,8 @@ initial_conditions <- function(
     x4_initial = 1.0, 
     x5_initial = 1.0,
     input1_initial = 0.025,
-    input2_initial = 0.975
+    input2_initial = 0.975,
+    h42 = 0.75
   ) {
   t_minutes <- seq(0, length_minutes, by = step_size_minutes)
   
@@ -33,7 +34,8 @@ initial_conditions <- function(
     x2 = x2,
     x3 = x3,
     x4 = x4,
-    x5 = x5
+    x5 = x5,
+    h42 = h42
   )
 }
 
@@ -50,7 +52,7 @@ turn_input2_off_and_on <- function(simulation_df, off_at_min = 10, on_at_min = 6
     mutate(input2 = new_input2)
 }
 
-run_euler <- function(simulation_df, h42 = 0.75) {
+run_euler <- function(simulation_df) {
   timestep <- simulation_df[2, "t_minutes"] - simulation_df[1, "t_minutes"]
   
   x1 <- rep(0, nrow(simulation_df))
@@ -64,6 +66,8 @@ run_euler <- function(simulation_df, h42 = 0.75) {
   x3[1] <- simulation_df[1, "x3"]
   x4[1] <- simulation_df[1, "x4"]
   x5[1] <- simulation_df[1, "x5"]
+  
+  h42 <- simulation_df[1, "h42"]
   
   for(i in 2:length(x1)) {
     input1 <- simulation_df[i, "input1"]
@@ -142,10 +146,11 @@ initial_conditions_run_and_plot <- function(run_name, x1_initial, x2_initial, x3
       x2_initial = x2_initial, 
       x3_initial = x3_initial, 
       x4_initial = x4_initial, 
-      x5_initial = x5_initial
+      x5_initial = x5_initial,
+      h42 = h42
     ) %>%
     turn_input2_off_and_on(off_at_min = input2_off_at_min, on_at_min = input2_on_at_min) %>%
-    run_euler(h42 = h42)
+    run_euler()
   
   simulation_df_long <- simulation_df %>%
     pivot_longer(starts_with("x"), values_to = "concentration", names_to = "xi") %>%
