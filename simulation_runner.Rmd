@@ -81,46 +81,22 @@ Set this to a value appropriate for your processor.
 num_cores <- 3
 ```
 
-## DO NOT MODIFY BELOW THIS LINE
-
 ### Create all plots in parallel
 
 ```{r}
-# cl <- makeCluster(num_cores, type = "PSOCK")
-# 
-# cluster_eval <- clusterEvalQ(cl, {
-#   library(dplyr)
-#   library(tidyr)
-#   library(ggplot2)
-#   source("simulation_core.R")
-# })
-# 
-# cluster_set_rng <- clusterSetRNGStream(cl, iseed = 1234)
-# 
-# results <- clusterApply(
-#   cl,
-#   run_specs,
-#   function(run_spec) {
-#     initial_conditions_run_and_plot(
-#       run_name = run_spec[["run_name"]],
-#       x1_initial = run_spec[["ics"]][[1]],
-#       x2_initial = run_spec[["ics"]][[2]],
-#       x3_initial = run_spec[["ics"]][[3]],
-#       x4_initial = run_spec[["ics"]][[4]],
-#       x5_initial = run_spec[["ics"]][[5]],
-#       input2_off_at_min = run_spec[["input2_off_at_min"]],
-#       input2_on_at_min = run_spec[["input2_on_at_min"]]
-#     )
-#   }
-# )  
-# 
-# cluster_stop <- stopCluster(cl)
-```
+cl <- makeCluster(num_cores, type = "PSOCK")
 
-## or create all plots serially
+cluster_eval <- clusterEvalQ(cl, {
+  library(dplyr)
+  library(tidyr)
+  library(ggplot2)
+  source("simulation_core.R")
+})
 
-```{r}
-results <- lapply(
+cluster_set_rng <- clusterSetRNGStream(cl, iseed = 1234)
+
+results <- clusterApply(
+  cl,
   run_specs,
   function(run_spec) {
     initial_conditions_run_and_plot(
@@ -136,6 +112,29 @@ results <- lapply(
     )
   }
 )
+
+cluster_stop <- stopCluster(cl)
+```
+
+## or create all plots serially
+
+```{r}
+# results <- lapply(
+#   run_specs,
+#   function(run_spec) {
+#     initial_conditions_run_and_plot(
+#       run_name = run_spec[["run_name"]],
+#       x1_initial = run_spec[["ics"]][[1]],
+#       x2_initial = run_spec[["ics"]][[2]],
+#       x3_initial = run_spec[["ics"]][[3]],
+#       x4_initial = run_spec[["ics"]][[4]],
+#       x5_initial = run_spec[["ics"]][[5]],
+#       h42 = run_spec[["h42"]],
+#       input2_off_at_min = run_spec[["input2_off_at_min"]],
+#       input2_on_at_min = run_spec[["input2_on_at_min"]]
+#     )
+#   }
+# )
 ```
 
 ### Write csvs and plots
