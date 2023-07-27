@@ -41,7 +41,7 @@ initial_condition_df <- cross_initial_conditions(
   h42 = c(0.3, 0.4, 0.5, 0.6, 0.7),
   input2_off_at_min = c(10),
   input2_on_at_min = c(20),
-  gamma_1 = c(0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0)
+  gamma_1 = c(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0)
 )
 
 print(paste("Number of simulations requested:", nrow(initial_condition_df), sep = " "))
@@ -67,8 +67,8 @@ theme_set(
 Set this to a value appropriate for your processor.
 
 ```{r}
-# num_cores <- 56
-num_cores <- 3
+num_cores <- 8
+# num_cores <- 3
 ```
 
 ### Create all plots in parallel
