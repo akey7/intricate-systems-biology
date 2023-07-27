@@ -10,7 +10,8 @@ initial_conditions <- function(
     x5_initial = 1.0,
     input1_initial = 0.025,
     input2_initial = 0.975,
-    h42 = 0.75
+    h42 = 0.75,
+    gamma_1 = 1.0
   ) {
   t_minutes <- seq(0, length_minutes, by = step_size_minutes)
   
@@ -35,7 +36,8 @@ initial_conditions <- function(
     x3 = x3,
     x4 = x4,
     x5 = x5,
-    h42 = h42
+    h42 = h42,
+    gamma_1 = gamma_1
   )
 }
 
@@ -68,13 +70,20 @@ run_euler <- function(simulation_df) {
   x5[1] <- simulation_df[1, "x5"]
   
   h42 <- simulation_df[1, "h42"]
+  gamma_1 <- simulation_df[1, "gamma_1"]
   
   for(i in 2:length(x1)) {
     input1 <- simulation_df[i, "input1"]
     input2 <- simulation_df[i, "input2"]
 
-    x1[i] <- x1[i-1]+timestep*(input1+input2*x4[i-1]^0.5-x1[i-1]^0.5)
-    x2[i] <- x2[i-1]+timestep*(x1[i-1]^0.5-x2[i-1]^0.75)
+    # x1[i] <- x1[i-1]+timestep*(input1+input2*x4[i-1]^0.5-x1[i-1]^0.5)
+    # x2[i] <- x2[i-1]+timestep*(x1[i-1]^0.5-x2[i-1]^0.75)
+    # x3[i] <- x3[i-1]+timestep*(2*x2[i-1]^0.75-2*x3[i-1]^0.4)
+    # x4[i] <- x4[i-1]+timestep*(2*x3[i-1]^0.4-input2*x4[i-1]^0.5-x2[i-1]^h42*x4[i-1]^0.5)
+    # x5[i] <- x5[i-1]+timestep*(x2[i-1]^h42*x4[i-1]^0.5-x5[i-1]^0.5)
+    
+    x1[i] <- x1[i-1]+timestep*(input1+input2*x4[i-1]^0.5-gamma_1*x1[i-1]^0.5)
+    x2[i] <- x2[i-1]+timestep*(gamma_1*x1[i-1]^0.5-x2[i-1]^0.75)
     x3[i] <- x3[i-1]+timestep*(2*x2[i-1]^0.75-2*x3[i-1]^0.4)
     x4[i] <- x4[i-1]+timestep*(2*x3[i-1]^0.4-input2*x4[i-1]^0.5-x2[i-1]^h42*x4[i-1]^0.5)
     x5[i] <- x5[i-1]+timestep*(x2[i-1]^h42*x4[i-1]^0.5-x5[i-1]^0.5)
@@ -92,7 +101,7 @@ run_euler <- function(simulation_df) {
   )
 }
 
-cross_initial_conditions <- function(x1, x2, x3, x4, x5, h42, input2_off_at_min, input2_on_at_min) {
+cross_initial_conditions <- function(x1, x2, x3, x4, x5, h42, input2_off_at_min, input2_on_at_min, gamma_1) {
   x1_df <- data.frame(x1 = x1)
   x2_df <- data.frame(x2 = x2)
   x3_df <- data.frame(x3 = x3)
@@ -101,6 +110,7 @@ cross_initial_conditions <- function(x1, x2, x3, x4, x5, h42, input2_off_at_min,
   h42_df <- data.frame(h42 = h42)
   input2_off_at_min_df <- data.frame(input2_off_at_min = input2_off_at_min)
   input2_on_at_min_df <- data.frame(input2_on_at_min = input2_on_at_min)
+  gamma_1_df <- data.frame(gamma_1 = gamma_1)
   
   initial_condition_df <- crossing(
     x1_df, 
@@ -110,7 +120,8 @@ cross_initial_conditions <- function(x1, x2, x3, x4, x5, h42, input2_off_at_min,
     x5_df,
     h42_df,
     input2_off_at_min_df,
-    input2_on_at_min_df
+    input2_on_at_min_df,
+    gamma_1_df
   )
 }
 
@@ -133,6 +144,7 @@ create_run_specs <- function(initial_condition_df) {
     run_specs[[i]][["h42"]] <- as.double(initial_condition_df[i, "h42"])
     run_specs[[i]][["input2_off_at_min"]] <- as.double(initial_condition_df[i, "input2_off_at_min"])
     run_specs[[i]][["input2_on_at_min"]] <- as.double(initial_condition_df[i, "input2_on_at_min"])
+    run_specs[[i]][["gamma_1"]] <- as.double(initial_condition_df[i, "gamma_1"])
     
     serial <- serial + 1
   }
@@ -140,14 +152,15 @@ create_run_specs <- function(initial_condition_df) {
   run_specs
 }
 
-initial_conditions_run_and_plot <- function(run_name, x1_initial, x2_initial, x3_initial, x4_initial, x5_initial, h42, input2_off_at_min, input2_on_at_min) {
+initial_conditions_run_and_plot <- function(run_name, x1_initial, x2_initial, x3_initial, x4_initial, x5_initial, h42, input2_off_at_min, input2_on_at_min, gamma_1) {
   simulation_df <- initial_conditions(
       x1_initial = x1_initial, 
       x2_initial = x2_initial, 
       x3_initial = x3_initial, 
       x4_initial = x4_initial, 
       x5_initial = x5_initial,
-      h42 = h42
+      h42 = h42,
+      gamma_1 = gamma_1
     ) %>%
     turn_input2_off_and_on(off_at_min = input2_off_at_min, on_at_min = input2_on_at_min) %>%
     run_euler()
