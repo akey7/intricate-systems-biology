@@ -200,6 +200,7 @@ initial_conditions_run_and_plot <- function(run_name, x1_initial, x2_initial, x3
     simulation_plot = simulation_plot, 
     run_name = run_name,
     h42 = h42,
+    gamma_1 = gamma_1,
     input2_off_at_min = input2_off_at_min,
     input2_on_at_min = input2_on_at_min
   )
@@ -209,7 +210,6 @@ write_plots <- function(results_list) {
   walk(results_list, function(.x) {
     plot_filename <- here("output", "plots", paste(.x[["run_name"]], "png", sep = "."))
     ggsave(plot_filename, plot = .x[["simulation_plot"]], units = "in", dpi = 300, height = 3, width = 5)
-    # print(paste("Wrote", plot_filename, sep = " "))
   })
 }
 
@@ -243,6 +243,7 @@ star_schema <- function(results_list) {
           intial_3_PGA = `3_PGA`,
           initial_PEP = PEP,
           initial_pyruvate = pyruvate,
+          gamma_1 = .x[["gamma_1"]]
         )
     })
   )
