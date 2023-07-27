@@ -32,26 +32,16 @@ Also, specify the number of cores for the parallel computation.
 Suggestion: Start with a limited number of parameters in each vector before you run huge numbers of parameters. Look for the output from this cell to find how many simulations you have requested.
 
 ```{r}
-# initial_condition_df <- cross_initial_conditions(
-#   x1 = c(1),
-#   x2 = c(0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0),
-#   x3 = c(1),
-#   x4 = c(0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0),
-#   x5 = c(1),
-#   h42 = c(0.65, 0.675, 0.7, 0.725, 0.75, 0.775, 0.8, 0.825, 0.85),
-#   input2_off_at_min = c(30),
-#   input2_on_at_min = c(60)
-# )
-
 initial_condition_df <- cross_initial_conditions(
-  x1 = c(1),
-  x2 = c(1),
-  x3 = c(1),
-  x4 = c(1),
-  x5 = c(1),
-  h42 = c(0.7, 0.75, 0.8),
-  input2_off_at_min = c(30),
-  input2_on_at_min = c(60)
+  x1 = c(0.5, 1.0, 1.5),
+  x2 = c(0.5, 1.0, 1.5),
+  x3 = c(0.5, 1.0, 1.5),
+  x4 = c(0.5, 1.0, 1.5),
+  x5 = c(0.5, 1.0, 1.5),
+  h42 = c(0, 0.7, 0.75),
+  input2_off_at_min = c(10),
+  input2_on_at_min = c(20, 30),
+  gamma_1 = c(0.0, 1.0)
 )
 
 print(paste("Number of simulations requested:", nrow(initial_condition_df), sep = " "))
@@ -108,7 +98,8 @@ results <- clusterApply(
       x5_initial = run_spec[["ics"]][[5]],
       h42 = run_spec[["h42"]],
       input2_off_at_min = run_spec[["input2_off_at_min"]],
-      input2_on_at_min = run_spec[["input2_on_at_min"]]
+      input2_on_at_min = run_spec[["input2_on_at_min"]],
+      gamma_1 = run_spec[["gamma_1"]]
     )
   }
 )
