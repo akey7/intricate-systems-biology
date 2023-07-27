@@ -33,14 +33,14 @@ Suggestion: Start with a limited number of parameters in each vector before you 
 
 ```{r}
 initial_condition_df <- cross_initial_conditions(
-  x1 = c(0.5, 1.0, 1.5),
-  x2 = c(0.5, 1.0, 1.5),
-  x3 = c(0.5, 1.0, 1.5),
-  x4 = c(0.5, 1.0, 1.5),
-  x5 = c(0.5, 1.0, 1.5),
-  h42 = c(0, 0.7, 0.75),
+  x1 = c(1.0),
+  x2 = c(1.0),
+  x3 = c(1.0),
+  x4 = c(1.0),
+  x5 = c(1.0),
+  h42 = c(0.25, 0.5, 0.7, 0.75, 1.0),
   input2_off_at_min = c(10),
-  input2_on_at_min = c(20, 30),
+  input2_on_at_min = c(30),
   gamma_1 = c(0.0, 1.0)
 )
 
