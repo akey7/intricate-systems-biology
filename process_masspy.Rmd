@@ -61,7 +61,9 @@ top_5_fluxes <- head(flux_stats$flux, n = 5)
 flux_long %>%
   filter(flux %in% top_5_fluxes[2:5]) %>%
   ggplot(aes(x = time_hr, y = mM_per_hr, color = flux)) +
-  geom_line()
+  geom_line() +
+  scale_x_log10() +
+  scale_y_log10()
 ```
 
 ## Concentration Data
@@ -90,7 +92,9 @@ concentration_stats <- concentration_long %>%
 top_5_concentrations <- head(concentration_stats$metabolite, n = 5)
 
 concentration_long %>%
-  filter(metabolite %in% top_5_concentrations[3:5]) %>%
+  filter(metabolite %in% top_5_concentrations) %>%
   ggplot(aes(x = time_hr, y = mM, color = metabolite)) +
-  geom_line()
+  geom_line() +
+  scale_x_log10() +
+  scale_y_log10()
 ```
