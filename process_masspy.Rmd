@@ -1,0 +1,39 @@
+---
+title: "Analyze MASSpy Output"
+author: "Alicia Key"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load the libraries
+
+```{r}
+library(readr)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(here)
+```
+
+## Load the data
+
+```{r}
+flux_sol <- read_csv(here("input", "flux_sol.csv"))
+conc_sol <- read_csv(here("input", "conc_sol.csv"))
+```
+
+## Examine the data
+
+```{r}
+head(flux_sol)
+```
+
+```{r}
+head(conc_sol)
+```
+
+
