@@ -25,32 +25,19 @@ library(here)
 theme_set(theme_linedraw())
 ```
 
-## Load the data
+## Flux data
+
+### Load it
 
 ```{r}
-flux_sol <- read_csv(here("input", "flux_sol.csv"))
-conc_sol <- read_csv(here("input", "conc_sol.csv"))
+flux_sol <- read_csv(here("input", "flux_trajectories.csv"))
 ```
-
-## Display head of the data
-
-```{r}
-head(flux_sol)
-```
-
-```{r}
-head(conc_sol)
-```
-
-## Flux Operations
-
-This section will operate on the fluxes of the reactions dataframe.
 
 ### Pivot longer
 
 ```{r}
 flux_long <- flux_sol %>%
-  pivot_longer(-Time, names_to = "flux", values_to = "mM_per_hr")
+  pivot_longer(-time_hr, names_to = "flux", values_to = "mM_per_hr")
 
 head(flux_long)
 ```
@@ -60,7 +47,7 @@ head(flux_long)
 ```{r}
 flux_stats <- flux_long %>%
   group_by(flux) %>%
-  summarize(cv = sd(mM_per_hr) / mean(mM_per_hr)) %>%
+  summarize(cv = sd(mM_per_hr) / mean(mM_per_hr), max_mM_per_hr = max(mM_per_hr)) %>%
   arrange(desc(cv))
 
 head(flux_stats, n = 5)
@@ -73,41 +60,6 @@ top_5_fluxes <- head(flux_stats$flux, n = 5)
 
 flux_long %>%
   filter(flux %in% top_5_fluxes) %>%
-  ggplot(aes(x = Time, y = mM_per_hr, color = flux)) +
+  ggplot(aes(x = time_hr, y = mM_per_hr, color = flux)) +
   geom_line()
-```
-
-## Concentration Operations
-
-This operates on the concentrations of metabolite dataframe.
-
-### Pivot longer
-
-```{r}
-conc_long <- conc_sol %>%
-  pivot_longer(-Time, names_to = "metabolite", values_to = "mM")
-
-head(conc_long)
-```
-
-### Order by descending CV
-
-```{r}
-conc_stats <- conc_long %>%
-  group_by(metabolite) %>%
-  summarize(cv = sd(mM) / mean(mM)) %>%
-  arrange(desc(cv))
-
-head(conc_stats, n = 5)
-```
-### Plot the metabolites
-
-```{r}
-top_5_metabolites <- head(conc_stats$metabolite, n = 2)
-
-conc_long %>%
-  filter(metabolite %in% top_5_metabolites) %>%
-  ggplot(aes(x = Time, y = mM, color = metabolite)) +
-  geom_line() +
-  scale_x_log10()
 ```
