@@ -116,7 +116,7 @@ Use the top 5 concentration from the perturbed concentrations.
 
 ```{r}
 concentration_ss_long %>%
-  filter(metabolite %in% top_5_concentrations) %>%
+  filter(metabolite %in% top_5_concentrations, time_hr <= max(concentration_long$time_hr)) %>%
   ggplot(aes(x = time_hr, y = mM, color = metabolite)) +
   geom_line() +
   scale_x_log10() +
