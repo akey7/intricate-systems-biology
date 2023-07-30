@@ -22,7 +22,7 @@ library(here)
 ## Set a plot theme
 
 ```{r}
-theme_set(theme_linedraw())
+theme_set(theme_minimal())
 ```
 
 ## Flux data
@@ -59,11 +59,9 @@ head(flux_stats, n = 5)
 top_5_fluxes <- head(flux_stats$flux, n = 5)
 
 flux_long %>%
-  filter(flux %in% top_5_fluxes[2:5]) %>%
+  filter(flux %in% top_5_fluxes, time_hr <= 0.01) %>%
   ggplot(aes(x = time_hr, y = mM_per_hr, color = flux)) +
-  geom_line() +
-  scale_x_log10() +
-  scale_y_log10()
+  geom_line()
 ```
 
 ## Concentration Data
@@ -92,9 +90,10 @@ concentration_stats <- concentration_long %>%
 top_5_concentrations <- head(concentration_stats$metabolite, n = 5)
 
 concentration_long %>%
-  filter(metabolite %in% top_5_concentrations) %>%
+  filter(metabolite %in% top_5_concentrations, time_hr <= 0.01) %>%
   ggplot(aes(x = time_hr, y = mM, color = metabolite)) +
   geom_line() +
   scale_x_log10() +
-  scale_y_log10()
+  scale_y_log10() +
+  theme_minimal()
 ```
