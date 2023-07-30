@@ -59,7 +59,38 @@ head(flux_stats, n = 5)
 top_5_fluxes <- head(flux_stats$flux, n = 5)
 
 flux_long %>%
-  filter(flux %in% top_5_fluxes) %>%
+  filter(flux %in% top_5_fluxes[2:5]) %>%
   ggplot(aes(x = time_hr, y = mM_per_hr, color = flux)) +
+  geom_line()
+```
+
+## Concentration Data
+
+### Load the data
+
+```{r}
+concentration_trajectories = read_csv(here("input", "concentration_trajectories.csv"))
+```
+
+### Prepare the data
+
+```{r}
+concentration_long <- concentration_trajectories %>%
+  pivot_longer(-time_hr, values_to = "mM", names_to = "metabolite")
+```
+
+### Plot the data
+
+```{r}
+concentration_stats <- concentration_long %>%
+  group_by(metabolite) %>%
+  summarize(cv = sd(mM) / mean(mM)) %>%
+  arrange(desc(cv))
+
+top_5_concentrations <- head(concentration_stats$metabolite, n = 5)
+
+concentration_long %>%
+  filter(metabolite %in% top_5_concentrations[3:5]) %>%
+  ggplot(aes(x = time_hr, y = mM, color = metabolite)) +
   geom_line()
 ```
