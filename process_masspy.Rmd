@@ -64,7 +64,7 @@ flux_long %>%
   geom_line()
 ```
 
-## Concentration Data
+## Perturbed Concentration Data
 
 ### Load the data
 
@@ -94,6 +94,31 @@ concentration_long %>%
   ggplot(aes(x = time_hr, y = mM, color = metabolite)) +
   geom_line() +
   scale_x_log10() +
-  scale_y_log10() +
-  theme_minimal()
+  scale_y_log10()
+```
+
+## Steady State Concentration Data
+
+### Load the data
+
+```{r}
+concentration_ss_trajectories <- read_csv(here("input", "concentration_ss_trajectories.csv"))
+```
+
+### Pivot the data
+
+```{r}
+concentration_ss_long <- concentration_ss_trajectories %>%
+  pivot_longer(-time_hr, values_to = "mM", names_to = "metabolite")
+```
+
+Use the top 5 concentration from the perturbed concentrations.
+
+```{r}
+concentration_ss_long %>%
+  filter(metabolite %in% top_5_concentrations) %>%
+  ggplot(aes(x = time_hr, y = mM, color = metabolite)) +
+  geom_line() +
+  scale_x_log10() +
+  scale_y_log10()
 ```
