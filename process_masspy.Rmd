@@ -26,7 +26,7 @@ flux_sol <- read_csv(here("input", "flux_sol.csv"))
 conc_sol <- read_csv(here("input", "conc_sol.csv"))
 ```
 
-## Examine the data
+## Display head of the data
 
 ```{r}
 head(flux_sol)
@@ -36,4 +36,26 @@ head(flux_sol)
 head(conc_sol)
 ```
 
+## Flux Operations
 
+This section will operate on the flux dataframe.
+
+### Pivot longer
+
+```{r}
+flux_long <- flux_sol %>%
+  pivot_longer(-Time, names_to = "reaction", values_to = "flux_mM_per_hr")
+
+head(flux_long)
+```
+
+### Find CVs of all fluxes
+
+```{r}
+flux_stats <- flux_long %>%
+  group_by(reaction) %>%
+  summarize(cv = sd(flux_mM_per_hr) / mean(flux_mM_per_hr)) %>%
+  arrange(desc(cv))
+
+head(flux_stats)
+```
