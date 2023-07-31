@@ -96,7 +96,7 @@ concentration_stats <- concentration_long %>%
 
 top_5_concentrations <- head(concentration_stats$metabolite, n = 5)
 
-concentration_long %>%
+p1 <- concentration_long %>%
   filter(metabolite %in% top_5_concentrations) %>%
   ggplot(aes(x = time_hr, y = mM, color = metabolite)) +
   geom_line(linewidth = 1) +
@@ -107,6 +107,10 @@ concentration_long %>%
     y = "concentration [mM]",
     title = "Concentrations, Perturbed"
   )
+
+ggsave(here("output", "perturbed.png"), plot = p1, units = "in", dpi = 300, height = 3, width = 5)
+
+p1
 ```
 
 ## Steady State Concentration Data
@@ -127,7 +131,7 @@ concentration_ss_long <- concentration_ss_trajectories %>%
 Use the top 5 concentration from the perturbed concentrations.
 
 ```{r}
-concentration_ss_long %>%
+p2 <- concentration_ss_long %>%
   filter(metabolite %in% top_5_concentrations, time_hr <= max(concentration_long$time_hr)) %>%
   ggplot(aes(x = time_hr, y = mM, color = metabolite)) +
   geom_line(linewidth = 1) +
@@ -138,4 +142,8 @@ concentration_ss_long %>%
     y = "concentration [mM]",
     title = "Concentrations, Steady State"
   )
+
+ggsave(here("output", "steady_state.png"), plot = p2, units = "in", dpi = 300, height = 3, width = 5)
+
+p2
 ```
