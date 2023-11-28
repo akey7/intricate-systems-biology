@@ -33,14 +33,15 @@ Suggestion: Start with a limited number of parameters in each vector before you 
 
 ```{r}
 initial_condition_df <- cross_initial_conditions(
-  x1 = c(1),
-  x2 = c(0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0),
-  x3 = c(1),
-  x4 = c(0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0),
-  x5 = c(1),
-  h42 = c(0.65, 0.675, 0.7, 0.725, 0.75, 0.775, 0.8, 0.825, 0.85),
-  input2_off_at_min = c(30),
-  input2_on_at_min = c(60)
+  x1 = c(1.0),
+  x2 = c(1.0),
+  x3 = c(1.0),
+  x4 = c(1.0),
+  x5 = c(1.0),
+  h42 = c(0.3, 0.4, 0.5, 0.6, 0.7),
+  input2_off_at_min = c(10),
+  input2_on_at_min = c(20),
+  gamma_1 = c(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0)
 )
 
 print(paste("Number of simulations requested:", nrow(initial_condition_df), sep = " "))
@@ -66,25 +67,23 @@ theme_set(
 Set this to a value appropriate for your processor.
 
 ```{r}
-num_cores <- 56
-# num_cores <- 3
+# num_cores <- 8
+num_cores <- 3
 ```
-
-## DO NOT MODIFY BELOW THIS LINE
 
 ### Create all plots in parallel
 
 ```{r}
-cl <- makeCluster(num_cores, type = "PSOCK") # 7596.613 ms on Threadripper, 56 workers
+cl <- makeCluster(num_cores, type = "PSOCK")
 
-clusterEvalQ(cl, {
+cluster_eval <- clusterEvalQ(cl, {
   library(dplyr)
   library(tidyr)
   library(ggplot2)
   source("simulation_core.R")
-}) # 1910.141 ms on Threadripper, 56 workers
+})
 
-clusterSetRNGStream(cl, iseed = 1234)  # 4.1063	ms on Threadripper, 56 workers
+cluster_set_rng <- clusterSetRNGStream(cl, iseed = 1234)
 
 results <- clusterApply(
   cl,
@@ -99,15 +98,34 @@ results <- clusterApply(
       x5_initial = run_spec[["ics"]][[5]],
       h42 = run_spec[["h42"]],
       input2_off_at_min = run_spec[["input2_off_at_min"]],
-      input2_on_at_min = run_spec[["input2_on_at_min"]]
+      input2_on_at_min = run_spec[["input2_on_at_min"]],
+      gamma_1 = run_spec[["gamma_1"]]
     )
   }
-)  
+)
 
-# Above took 176946.2 ms on Threadripper, 56 workers, 576 tasks 
-# (note processor usage only spikes for a few seconds), 307 ms/task
+cluster_stop <- stopCluster(cl)
+```
 
-stopCluster(cl)  # 4.1195	ms on Threadripper, 56 workers
+## or create all plots serially
+
+```{r}
+# results <- lapply(
+#   run_specs,
+#   function(run_spec) {
+#     initial_conditions_run_and_plot(
+#       run_name = run_spec[["run_name"]],
+#       x1_initial = run_spec[["ics"]][[1]],
+#       x2_initial = run_spec[["ics"]][[2]],
+#       x3_initial = run_spec[["ics"]][[3]],
+#       x4_initial = run_spec[["ics"]][[4]],
+#       x5_initial = run_spec[["ics"]][[5]],
+#       h42 = run_spec[["h42"]],
+#       input2_off_at_min = run_spec[["input2_off_at_min"]],
+#       input2_on_at_min = run_spec[["input2_on_at_min"]]
+#     )
+#   }
+# )
 ```
 
 ### Write csvs and plots
